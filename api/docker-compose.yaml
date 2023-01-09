@@ -1,0 +1,40 @@
+version: '3'
+services:
+  api:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      DB_NAME: ${DB_NAME:-werk}
+      DB_USER: ${DB_USER:-devuser}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PASSWORD: ${DB_PASSWORD:-dev123}
+
+    networks:
+      - api
+
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-werk}
+      POSTGRES_USER: ${POSTGRES_USER:-devuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev123}
+
+    volumes:
+      - ./.db_data:/var/lib/postgresql/data
+
+    networks:
+      - api
+
+    ports:
+      - 5432:5432
+
+volumes:
+  .db_data:
+
+networks:
+  api:
+    driver: bridge
