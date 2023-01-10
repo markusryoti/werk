@@ -6,6 +6,8 @@ import {
     signInWithEmailAndPassword,
     signOut,
     UserCredential,
+    setPersistence,
+    inMemoryPersistence,
 } from 'firebase/auth'
 
 export interface AuthContext {
@@ -35,13 +37,18 @@ export const AuthContextProvider = ({
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            await setPersistence(auth, inMemoryPersistence)
+
             if (user) {
                 setUser({
                     uid: user.uid,
                     email: user.email,
                     displayName: user.displayName
                 })
+
+                const token = await user.getIdToken()
+                doSessionLogin(token)
             } else {
                 setUser(null)
             }
@@ -50,6 +57,17 @@ export const AuthContextProvider = ({
 
         return () => unsubscribe()
     }, [])
+
+    const doSessionLogin = (token: string) => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessionLogin`, {
+            method: 'POST',
+            body: JSON.stringify({ idToken: token }),
+            credentials: 'include'
+        })
+            .then(res => res.json())
+            .then(res => console.log(res))
+            .catch(err => console.error(err))
+    }
 
     const signup = (email: string, password: string): Promise<UserCredential> => {
         return createUserWithEmailAndPassword(auth, email, password)
@@ -74,3 +92,4 @@ export const AuthContextProvider = ({
         </authContext.Provider>
     )
 }
+

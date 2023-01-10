@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -6,6 +6,6 @@ const firebaseConfig = {
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
 };
 
-const app = initializeApp(firebaseConfig)
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 
-export const auth = getAuth(app)

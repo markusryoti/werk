@@ -54,6 +54,23 @@ func (c *Client) GetSessionCookie(r *http.Request, token string, expiresIn time.
 		Value:    cookie,
 		MaxAge:   int(expiresIn.Seconds()),
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
+		SameSite: http.SameSiteNoneMode,
 	}, nil
+}
+
+func (c *Client) GetTokenFromSessionCookie(r *http.Request) (*firebaseAuth.Token, error) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		return nil, err
+	}
+
+	c.logger.Infow("session cookie", "cookie", cookie)
+
+	decoded, err := c.authClient.VerifySessionCookieAndCheckRevoked(r.Context(), cookie.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	return decoded, nil
 }

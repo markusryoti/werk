@@ -39,6 +39,7 @@ func (s *Router) registerRoutes() {
 	s.setCors()
 
 	s.router.Get("/", s.indexHandler)
+	s.router.Post("/sessionLogin", s.sessionLogin)
 
 	s.router.Route("/workouts", func(r chi.Router) {
 		r.Use(s.isAuthenticated)
@@ -51,10 +52,10 @@ func (s *Router) registerRoutes() {
 
 func (s *Router) setCors() {
 	s.router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"http://*, https://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-		ExposedHeaders:   []string{"Link"},
+		ExposedHeaders:   []string{"Set-Cookie"},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
