@@ -15,10 +15,10 @@ type Router struct {
 	router     *chi.Mux
 	logger     *zap.SugaredLogger
 	authClient *auth.Client
-	repo       service.Repository
+	repo       service.Service
 }
 
-func NewRouter(router *chi.Mux, repo service.Repository, logger *zap.SugaredLogger, authClient *auth.Client) *Router {
+func NewRouter(router *chi.Mux, repo service.Service, logger *zap.SugaredLogger, authClient *auth.Client) *Router {
 	s := &Router{
 		router:     router,
 		logger:     logger,
@@ -39,23 +39,22 @@ func (s *Router) registerRoutes() {
 	s.setCors()
 
 	s.router.Get("/", s.indexHandler)
-	s.router.Post("/sessionLogin", s.sessionLogin)
-
 	s.router.Route("/workouts", func(r chi.Router) {
 		r.Use(s.isAuthenticated)
 		r.Get("/", s.getAllWorkouts)
-		r.Post("/add", s.addWorkoutHandler)
+		r.Post("/", s.addWorkoutHandler)
+		r.Get("/{workoutId}", s.getWorkout)
 		r.Post("/{workoutId}/addMovement", s.addMovementHandler)
 		r.Get("/{workoutId}/workoutMovements", s.getMovementsFromWorkout)
+		r.Post("/{workoutId}/workoutMovements/{movementId}", s.addSet)
 	})
 }
 
 func (s *Router) setCors() {
 	s.router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://*, https://*"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-		ExposedHeaders:   []string{"Set-Cookie"},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))

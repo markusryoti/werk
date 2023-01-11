@@ -47,6 +47,29 @@ func (s *Router) getAllWorkouts(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(w, workouts, http.StatusOK)
 }
 
+func (s *Router) getWorkout(w http.ResponseWriter, r *http.Request) {
+	workoutIdStr := chi.URLParam(r, "workoutId")
+
+	if workoutIdStr == "" {
+		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	workoutId, err := strconv.ParseUint(workoutIdStr, 10, 64)
+	if err != nil {
+		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	workout, err := s.repo.GetWorkout(workoutId)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't get workout", err, http.StatusInternalServerError)
+		return
+	}
+
+	JsonResponse(w, workout, http.StatusOK)
+}
+
 func (s *Router) addMovementHandler(w http.ResponseWriter, r *http.Request) {
 	workoutIdStr := chi.URLParam(r, "workoutId")
 
@@ -61,7 +84,14 @@ func (s *Router) addMovementHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.repo.AddNewMovement(workoutId, "new movement")
+	movementName := r.URL.Query().Get("name")
+
+	if movementName == "" {
+		JsonErrorResponse(w, "empty movement name", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	err = s.repo.AddNewMovement(workoutId, movementName)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add new movement", err, http.StatusInternalServerError)
 		return

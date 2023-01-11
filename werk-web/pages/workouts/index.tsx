@@ -1,4 +1,4 @@
-import Workout from "./workout";
+import WorkoutListView from "../../components/workout-list-view";
 
 export interface IWorkout {
     id: number;
@@ -8,29 +8,38 @@ export interface IWorkout {
 }
 
 export interface Movement {
+    name: string;
+    sets: Set[]
+}
 
+export interface Set {
+    reps: number;
+    weight: number;
 }
 
 export default function Workouts({ workouts }: any) {
     return (
-        <>
-            <div>Workouts</div>
-            {workouts && workouts.map((w, i) => <Workout key={i} workout={w} />)}
-        </>
+        <div className="container mx-auto pt-8">
+            {workouts && workouts.map((w: IWorkout, i: number) => <WorkoutListView key={i} workout={w} />)}
+        </div>
     )
 }
 
 export async function getServerSideProps(context: any) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts`, { credentials: "include" })
+    const token = context.req.cookies.session
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    })
+
     const workouts = await res.json()
-
-    console.log('cookies', context.req.cookies)
-
-    console.log(workouts)
 
     return {
         props: {
-            workouts: []
+            workouts
         }
     }
 }

@@ -6,12 +6,10 @@ import {
     signInWithEmailAndPassword,
     signOut,
     UserCredential,
-    setPersistence,
-    inMemoryPersistence,
 } from 'firebase/auth'
 
 export interface AuthContext {
-    user: AuthUser | null;
+    authUser: AuthUser | null;
     login: (email: string, password: string) => Promise<UserCredential>
     signup: (email: string, password: string) => Promise<UserCredential>
     logout: () => Promise<void>
@@ -33,40 +31,44 @@ export const AuthContextProvider = ({
 }: {
     children: React.ReactNode
 }) => {
-    const [user, setUser] = useState<AuthUser | null>(null)
+    const [authUser, setAuthUser] = useState<AuthUser | null>({} as AuthUser)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            await setPersistence(auth, inMemoryPersistence)
-
             if (user) {
-                setUser({
+                setAuthUser({
                     uid: user.uid,
                     email: user.email,
                     displayName: user.displayName
                 })
 
                 const token = await user.getIdToken()
-                doSessionLogin(token)
+                await doSessionLogin(token)
             } else {
-                setUser(null)
+                setAuthUser(null)
+                await doSessionLogout()
             }
             setLoading(false)
         })
 
-        return () => unsubscribe()
+        return () => {
+            unsubscribe()
+        }
     }, [])
 
-    const doSessionLogin = (token: string) => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessionLogin`, {
-            method: 'POST',
-            body: JSON.stringify({ idToken: token }),
-            credentials: 'include'
+    const doSessionLogin = async (token: string) => {
+        const res = await fetch('/api/session', {
+            method: 'post',
+            body: JSON.stringify({ token }),
         })
-            .then(res => res.json())
-            .then(res => console.log(res))
-            .catch(err => console.error(err))
+
+        const body = await res.json()
+        console.log(body)
+    }
+
+    const doSessionLogout = async () => {
+        await fetch('/api/logout')
     }
 
     const signup = (email: string, password: string): Promise<UserCredential> => {
@@ -78,7 +80,7 @@ export const AuthContextProvider = ({
     }
 
     const logout = async () => {
-        setUser(null)
+        setAuthUser(null)
         await signOut(auth)
     }
 
@@ -87,9 +89,8 @@ export const AuthContextProvider = ({
     }
 
     return (
-        <authContext.Provider value={{ user, login, signup, logout, getToken }}>
+        <authContext.Provider value={{ authUser, login, signup, logout, getToken }}>
             {loading ? null : children}
         </authContext.Provider>
     )
 }
-
