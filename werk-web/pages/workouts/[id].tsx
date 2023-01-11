@@ -7,7 +7,44 @@ interface Props {
 
 export default function WorkoutDetail({ workout }: Props) {
     return (
-        <div>{JSON.stringify(workout)}</div>
+        <div className="container mx-auto mt-8">
+            <div className="mt-4 mb-4 p-2">
+                <h2 className="text-2xl font-bold">{workout.date.toLocaleString()}</h2>
+                <h3 className="text-xl">{workout.name}</h3>
+            </div>
+            {workout.movements && workout.movements.map((movement, i) => {
+                return (
+                    <div key={`movement-${i}`} className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box mt-4 mb-4">
+                        <input type="checkbox" className="peer" />
+                        <div className="collapse-title">
+                            {movement.name}
+                        </div>
+                        <div className="collapse-content">
+                            <table className="table w-full">
+                                <thead>
+                                    <tr>
+                                        <th>Set</th>
+                                        <th>Reps</th>
+                                        <th>Weight</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {movement.sets.map((set, j) => {
+                                        return (
+                                            <tr key={`set-${j}`}>
+                                                <td>{j + 1}</td>
+                                                <td>{set.reps}</td>
+                                                <td>{set.weight}</td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div >
+                )
+            })}
+        </div >
     )
 }
 

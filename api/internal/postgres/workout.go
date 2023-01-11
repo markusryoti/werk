@@ -59,6 +59,7 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 	var (
 		workout         types.Workout
 		currentMovement types.Movement
+		movementCount   int
 	)
 
 	workout.Movements = make([]types.Movement, 0)
@@ -84,9 +85,13 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 		}
 
 		currentMovement.Sets = append(currentMovement.Sets, types.Set{Reps: reps, Weight: weight})
+		movementCount++
 	}
 
-	workout.Movements = append(workout.Movements, currentMovement)
+	if movementCount > 0 {
+		workout.Movements = append(workout.Movements, currentMovement)
+	}
+
 	workout.ID = workoutId
 
 	return workout, rows.Err()
