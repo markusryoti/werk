@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { IWorkout } from "../pages/workouts"
+import { parseDate } from "../utils/date"
 
 interface Props {
     workout: IWorkout
@@ -10,7 +11,7 @@ export default function WorkoutListView({ workout }: Props) {
         <div className="card bg-base-200 mt-2">
             <div className="card-body">
                 <Link href={`/workouts/${workout.id}`}>
-                    <h2 className="card-title">{workout.date.toLocaleString()}</h2>
+                    <h2 className="card-title">{parseDate(workout.date)}</h2>
                 </Link>
                 <p>{workout.name}</p>
             </div>

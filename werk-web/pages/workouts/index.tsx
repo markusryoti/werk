@@ -14,14 +14,21 @@ export interface Movement {
 }
 
 export interface Set {
+    id: number;
     reps: number;
     weight: number;
 }
 
-export default function Workouts({ workouts }: any) {
+interface Props {
+    workouts: IWorkout[]
+}
+
+export default function Workouts({ workouts }: Props) {
     return (
         <div className="container mx-auto pt-8 p-1">
-            {workouts && workouts.map((w: IWorkout, i: number) => <WorkoutListView key={i} workout={w} />)}
+            {workouts.length > 0
+                ? workouts.map((w: IWorkout, i: number) => <WorkoutListView key={i} workout={w} />)
+                : <p>No workouts</p>}
         </div>
     )
 }

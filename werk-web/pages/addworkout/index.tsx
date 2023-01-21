@@ -1,28 +1,19 @@
 import { useRouter } from "next/router"
 import { FormEvent, useState } from "react"
-import { useAuth } from "../context/AuthUserContext"
+import { useClientRequest } from "../../hooks/use-request"
 
 export default function AddWorkout() {
     const [workoutName, setWorkoutName] = useState('')
 
     const router = useRouter()
-    const { getToken } = useAuth()
+    const { doRequest } = useClientRequest()
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
 
-        const token = await getToken()
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts`
 
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts`, {
-            method: 'POST',
-            body: JSON.stringify({
-                "workoutName": workoutName
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-        })
+        doRequest(url, 'POST', { workoutName: workoutName })
             .then(res => res.json())
             .then(res => console.log(res))
             .then(() => router.push('workouts'))

@@ -44,7 +44,7 @@ func workoutsToDomain(workouts []Workout) []types.Workout {
 }
 
 func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
-	query := `SELECT date, workout.name, movement.id, movement.name, reps, weight
+	query := `SELECT date, workout.name, movement.id, movement.name, movement_set.id, reps, weight
                 FROM workout
                 LEFT JOIN movement
                     ON workout.id = movement.workout_id
@@ -68,13 +68,14 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 
 	for rows.Next() {
 		var (
-			movementName string
-			movementId   uint64
-			reps         uint8
-			weight       uint8
+			movementName  string
+			movementId    uint64
+			movementSetId uint64
+			reps          uint8
+			weight        uint8
 		)
 
-		err = rows.Scan(&workout.Date, &workout.Name, &movementId, &movementName, &reps, &weight)
+		err = rows.Scan(&workout.Date, &workout.Name, &movementId, &movementName, &movementSetId, &reps, &weight)
 
 		if movementName != currentMovement.Name {
 			if currentMovement.Name != "" {
@@ -86,7 +87,7 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 		}
 
 		if reps != 0 && weight != 0 {
-			currentMovement.Sets = append(currentMovement.Sets, types.Set{Reps: reps, Weight: weight})
+			currentMovement.Sets = append(currentMovement.Sets, types.Set{ID: movementSetId, Reps: reps, Weight: weight})
 		}
 	}
 
