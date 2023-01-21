@@ -12,6 +12,14 @@ var (
 	ErrInvalidToken  = errors.New("invalid auth token")
 )
 
+type userCtxKey string
+
+func (u userCtxKey) String() string {
+	return string(u)
+}
+
+var userKey = userCtxKey("uid")
+
 func (s *Router) isAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
@@ -30,7 +38,7 @@ func (s *Router) isAuthenticated(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "uid", uid)
+		ctx := context.WithValue(r.Context(), userKey, uid)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

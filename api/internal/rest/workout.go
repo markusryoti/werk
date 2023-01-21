@@ -28,7 +28,9 @@ func (s *Router) addWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.repo.AddNewWorkout(newWorkout.WorkoutName)
+	uid, _ := r.Context().Value(userKey).(string)
+
+	err = s.repo.AddNewWorkout(uid, newWorkout.WorkoutName)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add a workout", err, http.StatusInternalServerError)
 		return

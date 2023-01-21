@@ -1,11 +1,16 @@
 package rest
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
+
+type AddMovementRequest struct {
+	MovementName string `json:"movementName"`
+}
 
 func (s *Router) addMovementHandler(w http.ResponseWriter, r *http.Request) {
 	workoutIdStr := chi.URLParam(r, "workoutId")
@@ -21,14 +26,22 @@ func (s *Router) addMovementHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	movementName := r.URL.Query().Get("name")
+	var reqBody AddMovementRequest
 
-	if movementName == "" {
+	defer r.Body.Close()
+
+	err = json.NewDecoder(r.Body).Decode(&reqBody)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't decode request body", err, http.StatusBadRequest)
+		return
+	}
+
+	if reqBody.MovementName == "" {
 		JsonErrorResponse(w, "empty movement name", ErrBadRequest, http.StatusBadRequest)
 		return
 	}
 
-	err = s.repo.AddNewMovement(workoutId, movementName)
+	err = s.repo.AddNewMovement(workoutId, reqBody.MovementName)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add new movement", err, http.StatusInternalServerError)
 		return

@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS workout (
     id SERIAL PRIMARY KEY,
     date timestamp DEFAULT now(),
     name VARCHAR(255),
-    uid CHAR(36)
+    uid CHAR(36),
+    user_id CHAR(36)
 );
 
 CREATE TABLE IF NOT EXISTS movement (

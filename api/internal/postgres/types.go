@@ -11,7 +11,7 @@ type Workout struct {
 	Date      time.Time
 	Name      string
 	Movements []Movement `db:"-"`
-	Uid       string
+	UserId    string     `db:"user_id"`
 }
 
 type Movement struct {

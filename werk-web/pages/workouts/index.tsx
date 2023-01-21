@@ -8,6 +8,7 @@ export interface IWorkout {
 }
 
 export interface Movement {
+    id: number;
     name: string;
     sets: Set[]
 }
@@ -19,7 +20,7 @@ export interface Set {
 
 export default function Workouts({ workouts }: any) {
     return (
-        <div className="container mx-auto pt-8">
+        <div className="container mx-auto pt-8 p-1">
             {workouts && workouts.map((w: IWorkout, i: number) => <WorkoutListView key={i} workout={w} />)}
         </div>
     )
@@ -39,7 +40,7 @@ export async function getServerSideProps(context: any) {
 
     return {
         props: {
-            workouts
+            workouts: workouts ? workouts : []
         }
     }
 }

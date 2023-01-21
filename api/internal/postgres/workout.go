@@ -2,10 +2,11 @@ package postgres
 
 import "github.com/markusryoti/werk/internal/types"
 
-func (p *PostgresRepo) AddNewWorkout(name string) error {
-	_, err := p.db.NamedExec(`INSERT INTO workout (name) VALUES (:name)`,
+func (p *PostgresRepo) AddNewWorkout(userId, name string) error {
+	_, err := p.db.NamedExec(`INSERT INTO workout (user_id, name) VALUES (:userId, :name)`,
 		map[string]interface{}{
-			"name": name,
+			"userId": userId,
+			"name":   name,
 		})
 
 	if err != nil {
@@ -16,13 +17,13 @@ func (p *PostgresRepo) AddNewWorkout(name string) error {
 }
 
 func (p *PostgresRepo) GetAllWorkouts() ([]types.Workout, error) {
-	rows, err := p.db.Queryx(`SELECT * FROM workout
+	rows, err := p.db.Queryx(`SELECT id, date, name, user_id FROM workout
                                 ORDER BY date DESC`)
 
 	workouts := make([]Workout, 0)
 
 	for rows.Next() {
-		w := Workout{}
+		var w Workout
 		err = rows.StructScan(&w)
 		workouts = append(workouts, w)
 	}
@@ -45,11 +46,12 @@ func workoutsToDomain(workouts []Workout) []types.Workout {
 func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 	query := `SELECT date, workout.name, movement.id, movement.name, reps, weight
                 FROM workout
-                JOIN movement
+                LEFT JOIN movement
                     ON workout.id = movement.workout_id
-                JOIN movement_set
+                LEFT JOIN movement_set
                     ON movement.id = movement_set.movement_id
-                WHERE workout.id = $1`
+                WHERE workout.id = $1
+                ORDER BY movement.id`
 
 	rows, err := p.db.Query(query, workoutId)
 	if err != nil {
@@ -59,7 +61,6 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 	var (
 		workout         types.Workout
 		currentMovement types.Movement
-		movementCount   int
 	)
 
 	workout.Movements = make([]types.Movement, 0)
@@ -84,11 +85,12 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 			currentMovement.Sets = make([]types.Set, 0)
 		}
 
-		currentMovement.Sets = append(currentMovement.Sets, types.Set{Reps: reps, Weight: weight})
-		movementCount++
+		if reps != 0 && weight != 0 {
+			currentMovement.Sets = append(currentMovement.Sets, types.Set{Reps: reps, Weight: weight})
+		}
 	}
 
-	if movementCount > 0 {
+	if currentMovement.ID != 0 {
 		workout.Movements = append(workout.Movements, currentMovement)
 	}
 

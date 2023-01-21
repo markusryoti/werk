@@ -30,20 +30,16 @@ export default function AddWorkout() {
     }
 
     return (
-        <div className="flex justify-center">
-            <div className="card w-1/2 bg-base-200 shadow-xl mt-16">
-                <div className="p-8">
-                    <h1 className="text-2xl">Add workout</h1>
-                </div>
-                <form onSubmit={handleSubmit} className="p-8">
-                    <div className="flex items-center m-2">
-                        <label htmlFor="workoutName" className="flex-none pr-2">Workout Name</label>
-                        <input type="text" id="workoutName" className="input w-full" onChange={e => setWorkoutName(e.target.value.trim())} />
+        <div className="flex justify-center p-1">
+            <div className="card w-full md:w-1/2 bg-base-200 shadow-xl mt-16">
+                <h1 className="card-title p-2">Add workout</h1>
+                <form onSubmit={handleSubmit} className="">
+                    <div className="flex flex-col m-2">
+                        <label htmlFor="workoutName">Workout Name</label>
+                        <input type="text" id="workoutName" className="input" onChange={e => setWorkoutName(e.target.value.trim())} />
                     </div>
-                    <div className="flex justify-center">
-                        <div className="m-2">
-                            <button type="submit" className="btn btn-primary">Add</button>
-                        </div>
+                    <div className="flex justify-center p-2">
+                        <button type="submit" className="btn btn-primary">Add</button>
                     </div>
                 </form>
             </div>

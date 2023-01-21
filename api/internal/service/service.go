@@ -3,7 +3,7 @@ package service
 import "github.com/markusryoti/werk/internal/types"
 
 type Service interface {
-	AddNewWorkout(name string) error
+	AddNewWorkout(userId, name string) error
 	GetWorkout(workoutId uint64) (types.Workout, error)
 	GetAllWorkouts() ([]types.Workout, error)
 	AddNewMovement(workoutId uint64, name string) error
