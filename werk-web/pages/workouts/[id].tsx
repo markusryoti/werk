@@ -25,7 +25,7 @@ export default function WorkoutDetail() {
     const getWorkout = () => {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`;
 
-        doRequest(url, 'GET', undefined)
+        doRequest(url, 'GET')
             .then(res => res.json())
             .then(w => setWorkout(w))
             .catch(err => console.error(err))
@@ -42,6 +42,15 @@ export default function WorkoutDetail() {
         }
 
         setMovementName('')
+    }
+
+    const removeWorkout = async () => {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`
+        const res = await doRequest(url, 'DELETE')
+
+        if (res.ok) {
+            router.push("/workouts")
+        }
     }
 
     if (!workout) {
@@ -80,7 +89,7 @@ export default function WorkoutDetail() {
                                                     <td>{set.reps}</td>
                                                     <td>{set.weight}</td>
                                                     <td>
-                                                        <RemoveSet set={set} />
+                                                        <RemoveSet set={set} updateWorkout={getWorkout} />
                                                     </td>
                                                 </tr>
                                             )
@@ -91,7 +100,7 @@ export default function WorkoutDetail() {
                             <div className="divider"></div>
                             <AddSet workoutId={workout.id} movementId={movement.id} updateWorkout={getWorkout} />
                             <div className="divider"></div>
-                            <RemoveMovement movement={movement} />
+                            <RemoveMovement movement={movement} updateWorkout={getWorkout} />
                         </div>
                     </div>
                 )
@@ -110,7 +119,7 @@ export default function WorkoutDetail() {
             <div className="card bg-base-200 shadow-l p-4">
                 <h3 className="card-title mb-2">Remove Workout</h3>
                 <div>
-                    <button className="btn btn-error w-full">Remove</button>
+                    <button onClick={removeWorkout} className="btn btn-error w-full">Remove</button>
                 </div>
             </div>
         </div >

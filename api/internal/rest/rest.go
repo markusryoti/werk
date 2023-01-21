@@ -15,15 +15,15 @@ type Router struct {
 	router     *chi.Mux
 	logger     *zap.SugaredLogger
 	authClient *auth.Client
-	repo       service.Service
+	svc        *service.Service
 }
 
-func NewRouter(router *chi.Mux, repo service.Service, logger *zap.SugaredLogger, authClient *auth.Client) *Router {
+func NewRouter(router *chi.Mux, svc *service.Service, logger *zap.SugaredLogger, authClient *auth.Client) *Router {
 	s := &Router{
 		router:     router,
 		logger:     logger,
 		authClient: authClient,
-		repo:       repo,
+		svc:        svc,
 	}
 
 	s.registerRoutes()
@@ -39,6 +39,7 @@ func (s *Router) registerRoutes() {
 	s.setCors()
 
 	s.router.Get("/", s.indexHandler)
+
 	s.router.Route("/workouts", func(r chi.Router) {
 		r.Use(s.isAuthenticated)
 		r.Get("/", s.getAllWorkouts)
@@ -47,6 +48,17 @@ func (s *Router) registerRoutes() {
 		r.Post("/{workoutId}/addMovement", s.addMovementHandler)
 		r.Get("/{workoutId}/workoutMovements", s.getMovementsFromWorkout)
 		r.Post("/{workoutId}/workoutMovements/{movementId}", s.addSet)
+		r.Delete("/{workoutId}", s.removeWorkout)
+	})
+
+	s.router.Route("/movements", func(r chi.Router) {
+		r.Use(s.isAuthenticated)
+		r.Delete("/{movementId}", s.removeMovement)
+	})
+
+	s.router.Route("/sets", func(r chi.Router) {
+		r.Use(s.isAuthenticated)
+		r.Delete("/{setId}", s.removeSet)
 	})
 }
 

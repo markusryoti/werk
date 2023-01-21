@@ -41,7 +41,7 @@ func (s *Router) addMovementHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.repo.AddNewMovement(workoutId, reqBody.MovementName)
+	err = s.svc.AddNewMovement(workoutId, reqBody.MovementName)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add new movement", err, http.StatusInternalServerError)
 		return
@@ -62,11 +62,27 @@ func (s *Router) getMovementsFromWorkout(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	movements, err := s.repo.GetMovementsFromWorkout(workoutId)
+	movements, err := s.svc.GetMovementsFromWorkout(workoutId)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't get movements", err, http.StatusInternalServerError)
 		return
 	}
 
 	JsonResponse(w, movements, http.StatusOK)
+}
+
+func (s *Router) removeMovement(w http.ResponseWriter, r *http.Request) {
+	movementIdStr := chi.URLParam(r, "movementId")
+
+	movementId, err := strconv.ParseUint(movementIdStr, 10, 64)
+	if err != nil {
+		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	err = s.svc.DeleteMovement(movementId)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't delete movement", err, http.StatusInternalServerError)
+		return
+	}
 }

@@ -16,3 +16,12 @@ func (p *PostgresRepo) AddMovementSet(movementId uint64, set types.Set) error {
 
 	return nil
 }
+
+func (p *PostgresRepo) DeleteMovementSet(movementSetId uint64) error {
+	_, err := p.db.NamedExec(`DELETE FROM movement_set WHERE id = :movementSetId`,
+		map[string]interface{}{
+			"movementSetId": movementSetId,
+		})
+
+	return err
+}

@@ -9,7 +9,7 @@ export interface ClientRequestParams {
 export function useClientRequest() {
     const { getToken } = useAuth()
 
-    const doRequest = async (url: string, method: string, body: any) => {
+    const doRequest = async (url: string, method: string, body: any = undefined) => {
         const token = await getToken()
 
         return await fetch(url, {
@@ -17,7 +17,8 @@ export function useClientRequest() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            }, body: JSON.stringify(body)
+            },
+            body: JSON.stringify(body)
         })
     }
 

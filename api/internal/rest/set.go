@@ -28,13 +28,30 @@ func (s *Router) addSet(w http.ResponseWriter, r *http.Request) {
 	movementIdStr := chi.URLParam(r, "movementId")
 	movementId, err := strconv.ParseUint(movementIdStr, 10, 64)
 
-	err = s.repo.AddMovementSet(movementId, types.Set{
+	err = s.svc.AddMovementSet(movementId, types.Set{
 		Reps:   reqBody.Reps,
 		Weight: reqBody.Weight,
 	})
 
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add a new set", err, http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Router) removeSet(w http.ResponseWriter, r *http.Request) {
+	setIdStr := chi.URLParam(r, "setId")
+
+	setId, err := strconv.ParseUint(setIdStr, 10, 64)
+	if err != nil {
+		JsonErrorResponse(w, "invalid delete request", err, http.StatusBadRequest)
+		return
+	}
+
+	err = s.svc.DeleteMovementSet(setId)
+
+	if err != nil {
+		JsonErrorResponse(w, "couldn't delete a set", err, http.StatusInternalServerError)
 		return
 	}
 }

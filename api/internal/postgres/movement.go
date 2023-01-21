@@ -48,6 +48,15 @@ func (p *PostgresRepo) GetMovementsFromWorkout(workoutId uint64) ([]types.Moveme
 	return movementsToDomain(sets, movements), err
 }
 
+func (p *PostgresRepo) DeleteMovement(movementId uint64) error {
+	_, err := p.db.NamedExec(`DELETE FROM movement WHERE id = :movementId`,
+		map[string]interface{}{
+			"movementId": movementId,
+		})
+
+	return err
+}
+
 func movementsToDomain(sets []MovementSet, movementMap map[uint64]Movement) []types.Movement {
 	var (
 		movements = make([]types.Movement, 0)

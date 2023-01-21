@@ -10,6 +10,7 @@ import (
 	"github.com/markusryoti/werk/internal/auth"
 	"github.com/markusryoti/werk/internal/postgres"
 	"github.com/markusryoti/werk/internal/rest"
+	"github.com/markusryoti/werk/internal/service"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +33,9 @@ func main() {
 
 	router.Use(middleware.Logger)
 
-	handler := rest.NewRouter(router, repo, logger, authClient)
+	svc := service.NewService(repo)
+
+	handler := rest.NewRouter(router, svc, logger, authClient)
 
 	s := &http.Server{
 		Addr:    ":8080",

@@ -99,3 +99,12 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 
 	return workout, rows.Err()
 }
+
+func (p *PostgresRepo) DeleteWorkout(workoutId uint64) error {
+	_, err := p.db.NamedExec(`DELETE FROM workout WHERE id = :workoutId`,
+		map[string]interface{}{
+			"workoutId": workoutId,
+		})
+
+	return err
+}
