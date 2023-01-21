@@ -28,9 +28,12 @@ func (s *Router) addSet(w http.ResponseWriter, r *http.Request) {
 	movementIdStr := chi.URLParam(r, "movementId")
 	movementId, err := strconv.ParseUint(movementIdStr, 10, 64)
 
+	userId := s.getCurrentUser(r)
+
 	err = s.svc.AddMovementSet(movementId, types.Set{
 		Reps:   reqBody.Reps,
 		Weight: reqBody.Weight,
+		User:   userId,
 	})
 
 	if err != nil {
@@ -45,6 +48,17 @@ func (s *Router) removeSet(w http.ResponseWriter, r *http.Request) {
 	setId, err := strconv.ParseUint(setIdStr, 10, 64)
 	if err != nil {
 		JsonErrorResponse(w, "invalid delete request", err, http.StatusBadRequest)
+		return
+	}
+
+	set, err := s.svc.GetMovementSet(setId)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't get movement set", err, http.StatusInternalServerError)
+		return
+	}
+
+	if set.User != s.getCurrentUser(r) {
+		JsonErrorResponse(w, "not authorized to remove set", err, http.StatusUnauthorized)
 		return
 	}
 

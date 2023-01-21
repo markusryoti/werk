@@ -14,17 +14,12 @@ type Movement struct {
 	ID   uint64 `json:"id"`
 	Name string `json:"name"`
 	Sets []Set  `json:"sets"`
+	User string `json:"-"`
 }
 
 type Set struct {
 	ID     uint64 `json:"id"`
 	Reps   uint8  `json:"reps"`
 	Weight uint8  `json:"weight"`
-}
-
-type User struct {
-	Id        string
-	Username  string
-	FirstName string
-	LastName  string
+	User   string `json:"-"`
 }

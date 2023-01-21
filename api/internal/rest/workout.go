@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	ErrBadRequest = errors.New("bad request")
+	ErrBadRequest    = errors.New("bad request")
+	ErrNotAuthorized = errors.New("not authorized")
 )
 
 type AddWorkoutRequest struct {
@@ -83,6 +84,17 @@ func (s *Router) removeWorkout(w http.ResponseWriter, r *http.Request) {
 	workoutId, err := strconv.ParseUint(workoutIdStr, 10, 64)
 	if err != nil {
 		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	workout, err := s.svc.GetWorkout(workoutId)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't get workout", err, http.StatusInternalServerError)
+		return
+	}
+
+	if workout.User != s.getCurrentUser(r) {
+		JsonErrorResponse(w, "not authorized", ErrNotAuthorized, http.StatusUnauthorized)
 		return
 	}
 

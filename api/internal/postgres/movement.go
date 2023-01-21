@@ -2,12 +2,13 @@ package postgres
 
 import "github.com/markusryoti/werk/internal/types"
 
-func (p *PostgresRepo) AddNewMovement(workoutId uint64, name string) error {
-	_, err := p.db.NamedExec(`INSERT INTO movement (name, workout_id)
-                                VALUES (:name, :workoutId)`,
+func (p *PostgresRepo) AddNewMovement(workoutId uint64, newMovement types.Movement) error {
+	_, err := p.db.NamedExec(`INSERT INTO movement (name, workout_id, user_id)
+                                VALUES (:name, :workoutId, :userId)`,
 		map[string]interface{}{
-			"name":      name,
+			"name":      newMovement.Name,
 			"workoutId": workoutId,
+			"userId":    newMovement.User,
 		})
 
 	if err != nil {
@@ -55,6 +56,15 @@ func (p *PostgresRepo) DeleteMovement(movementId uint64) error {
 		})
 
 	return err
+}
+
+func (p *PostgresRepo) GetMovement(movementId uint64) (types.Movement, error) {
+	var movement types.Movement
+
+	row := p.db.QueryRow("SELECT id, user_id FROM movement WHERE id = $1", movementId)
+	err := row.Scan(&movement.ID, &movement.User)
+
+	return movement, err
 }
 
 func movementsToDomain(sets []MovementSet, movementMap map[uint64]Movement) []types.Movement {

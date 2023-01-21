@@ -42,3 +42,8 @@ func (s *Router) isAuthenticated(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func (s *Router) getCurrentUser(r *http.Request) string {
+	uid, _ := r.Context().Value(userKey).(string)
+	return uid
+}

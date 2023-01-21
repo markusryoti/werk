@@ -20,6 +20,7 @@ type Movement struct {
 	WorkoutId uint64        `db:"workout_id"`
 	Sets      []MovementSet `db:"-"`
 	Uid       string
+	UserId    string `db:"user_id"`
 }
 
 type MovementSet struct {
@@ -28,6 +29,7 @@ type MovementSet struct {
 	Weight     uint8
 	MovementId uint64 `db:"movement_id"`
 	Uid        string
+	UserId     string `db:"user_id"`
 }
 
 func (w *Workout) toDomain() types.Workout {

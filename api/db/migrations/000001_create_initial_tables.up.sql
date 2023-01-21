@@ -3,14 +3,15 @@ CREATE TABLE IF NOT EXISTS workout (
     date timestamp DEFAULT now(),
     name VARCHAR(255),
     uid CHAR(36),
-    user_id CHAR(36)
+    user_id VARCHAR(36)
 );
 
 CREATE TABLE IF NOT EXISTS movement (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     workout_id INT REFERENCES workout(id) ON DELETE CASCADE,
-    uid CHAR(36)
+    uid CHAR(36),
+    user_id VARCHAR(36)
 );
 
 CREATE TABLE IF NOT EXISTS movement_set (
@@ -18,5 +19,6 @@ CREATE TABLE IF NOT EXISTS movement_set (
     reps SMALLINT,
     weight SMALLINT,
     movement_id INT REFERENCES movement(id) ON DELETE CASCADE,
-    uid CHAR(36)
+    uid CHAR(36),
+    user_id VARCHAR(36)
 );

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/markusryoti/werk/internal/types"
 )
 
 type AddMovementRequest struct {
@@ -41,7 +42,12 @@ func (s *Router) addMovementHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.svc.AddNewMovement(workoutId, reqBody.MovementName)
+	userId := s.getCurrentUser(r)
+
+	err = s.svc.AddNewMovement(workoutId, types.Movement{
+		Name: reqBody.MovementName,
+		User: userId,
+	})
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add new movement", err, http.StatusInternalServerError)
 		return
@@ -77,6 +83,17 @@ func (s *Router) removeMovement(w http.ResponseWriter, r *http.Request) {
 	movementId, err := strconv.ParseUint(movementIdStr, 10, 64)
 	if err != nil {
 		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	movement, err := s.svc.GetMovement(movementId)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't get movement", err, http.StatusInternalServerError)
+		return
+	}
+
+	if movement.User != s.getCurrentUser(r) {
+		JsonErrorResponse(w, "not authorized to remove movement", err, http.StatusUnauthorized)
 		return
 	}
 
