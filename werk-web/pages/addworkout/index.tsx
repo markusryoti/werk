@@ -22,7 +22,7 @@ export default function AddWorkout() {
 
     return (
         <div className="flex justify-center p-1">
-            <div className="card w-full md:w-1/2 bg-base-200 shadow-xl mt-16">
+            <div className="card w-full md:w-1/2 border border-base-300 bg-base-200 mt-16">
                 <h1 className="card-title p-2">Add workout</h1>
                 <form onSubmit={handleSubmit} className="">
                     <div className="flex flex-col m-2">
