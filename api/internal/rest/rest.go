@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -11,15 +12,20 @@ import (
 	"go.uber.org/zap"
 )
 
-type Router struct {
+var (
+	ErrBadRequest    = errors.New("bad request")
+	ErrNotAuthorized = errors.New("not authorized")
+)
+
+type Handler struct {
 	router     *chi.Mux
 	logger     *zap.SugaredLogger
 	authClient *auth.Client
 	svc        *service.Service
 }
 
-func NewRouter(router *chi.Mux, svc *service.Service, logger *zap.SugaredLogger, authClient *auth.Client) *Router {
-	s := &Router{
+func NewHandler(router *chi.Mux, svc *service.Service, logger *zap.SugaredLogger, authClient *auth.Client) *Handler {
+	s := &Handler{
 		router:     router,
 		logger:     logger,
 		authClient: authClient,
@@ -31,38 +37,21 @@ func NewRouter(router *chi.Mux, svc *service.Service, logger *zap.SugaredLogger,
 	return s
 }
 
-func (s *Router) Get() http.Handler {
+func (s *Handler) Get() http.Handler {
 	return s.router
 }
 
-func (s *Router) registerRoutes() {
+func (s *Handler) registerRoutes() {
 	s.setCors()
 
 	s.router.Get("/", s.indexHandler)
 
-	s.router.Route("/workouts", func(r chi.Router) {
-		r.Use(s.isAuthenticated)
-		r.Get("/", s.getAllWorkouts)
-		r.Post("/", s.addWorkoutHandler)
-		r.Get("/{workoutId}", s.getWorkout)
-		r.Post("/{workoutId}/addMovement", s.addMovementHandler)
-		r.Get("/{workoutId}/workoutMovements", s.getMovementsFromWorkout)
-		r.Post("/{workoutId}/workoutMovements/{movementId}", s.addSet)
-		r.Delete("/{workoutId}", s.removeWorkout)
-	})
-
-	s.router.Route("/movements", func(r chi.Router) {
-		r.Use(s.isAuthenticated)
-		r.Delete("/{movementId}", s.removeMovement)
-	})
-
-	s.router.Route("/sets", func(r chi.Router) {
-		r.Use(s.isAuthenticated)
-		r.Delete("/{setId}", s.removeSet)
-	})
+	s.registerWorkoutRoutes()
+	s.registerMovementRoutes()
+	s.registerMovementSetRoutes()
 }
 
-func (s *Router) setCors() {
+func (s *Handler) setCors() {
 	s.router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -72,7 +61,7 @@ func (s *Router) setCors() {
 	}))
 }
 
-func (s *Router) indexHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Handler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("hellooo"))
 }
 

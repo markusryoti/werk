@@ -1,6 +1,10 @@
 package postgres
 
-import "github.com/markusryoti/werk/internal/types"
+import (
+	"sort"
+
+	"github.com/markusryoti/werk/internal/types"
+)
 
 func (p *PostgresRepo) AddNewWorkout(userId, name string) error {
 	_, err := p.db.NamedExec(`INSERT INTO workout (user_id, name) VALUES (:userId, :name)`,
@@ -16,9 +20,10 @@ func (p *PostgresRepo) AddNewWorkout(userId, name string) error {
 	return nil
 }
 
-func (p *PostgresRepo) GetAllWorkouts() ([]types.Workout, error) {
-	rows, err := p.db.Queryx(`SELECT id, date, name, user_id FROM workout
-                                ORDER BY date DESC`)
+func (p *PostgresRepo) GetWorkoutsByUser(userId string) ([]types.Workout, error) {
+	rows, err := p.db.Queryx(`SELECT id, created_at, name, user_id FROM workout
+                                WHERE user_id = $1
+                                ORDER BY created_at DESC`, userId)
 
 	workouts := make([]Workout, 0)
 
@@ -30,30 +35,41 @@ func (p *PostgresRepo) GetAllWorkouts() ([]types.Workout, error) {
 
 	err = rows.Err()
 
-	return workoutsToDomain(workouts), err
+	return p.workoutsToDomain(workouts), err
 }
 
-func workoutsToDomain(workouts []Workout) []types.Workout {
-	domainWorkouts := make([]types.Workout, 0)
+func (p *PostgresRepo) workoutsToDomain(workouts []Workout) []types.Workout {
+	domainWorkouts := make([]types.Workout, len(workouts))
 
-	for _, w := range workouts {
-		domainWorkouts = append(domainWorkouts, w.toDomain())
+	for i, w := range workouts {
+		domainWorkouts[i] = w.toDomain()
 	}
 
 	return domainWorkouts
 }
 
 func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
-	query := `SELECT date, workout.name, workout.user_id, movement.id, movement.name, movement_set.id, reps, weight
-                FROM workout
-                LEFT JOIN movement
-                    ON workout.id = movement.workout_id
-                LEFT JOIN movement_set
-                    ON movement.id = movement_set.movement_id
-                WHERE workout.id = $1
-                ORDER BY movement.id`
+	query := `
+        SELECT
+          workout.created_at,
+          workout.name AS workout_name,
+          workout.user_id,
+          workout_movement.id AS workout_movement_id,
+          movement.name AS movement_name,
+          movement_set.id AS movement_set_id,
+          movement_set.reps,
+          movement_set.weight
+        FROM
+          workout
+          JOIN workout_movement ON workout.id = workout_movement.workout_id
+          JOIN movement ON workout_movement.movement_id = movement.id
+          LEFT JOIN movement_set ON workout_movement.id = movement_set.workout_movement_id
+        WHERE
+          workout.id = $1
+        ORDER BY
+          workout_movement.id ASC`
 
-	rows, err := p.db.Query(query, workoutId)
+	rows, err := p.db.Queryx(query, workoutId)
 	if err != nil {
 		return types.Workout{}, err
 	}
@@ -61,7 +77,6 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 	var (
 		workout         types.Workout
 		currentMovement types.Movement
-		userId          string
 	)
 
 	workout.Movements = make([]types.Movement, 0)
@@ -73,13 +88,14 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 			movementId    uint64
 			movementSetId uint64
 			reps          uint8
-			weight        uint8
+			weight        int
 		)
 
-		err = rows.Scan(&workout.Date, &workout.Name, &userId, &movementId, &movementName, &movementSetId, &reps, &weight)
+		err = rows.Scan(&workout.Date, &workout.Name, &workout.User, &movementId, &movementName, &movementSetId, &reps, &weight)
 
 		if movementName != currentMovement.Name {
 			if currentMovement.Name != "" {
+				currentMovement.Sets = p.sortSets(currentMovement.Sets)
 				workout.Movements = append(workout.Movements, currentMovement)
 			}
 
@@ -93,13 +109,23 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 	}
 
 	if currentMovement.ID != 0 {
+		currentMovement.Sets = p.sortSets(currentMovement.Sets)
 		workout.Movements = append(workout.Movements, currentMovement)
 	}
 
 	workout.ID = workoutId
-	workout.User = userId
 
 	return workout, rows.Err()
+}
+
+func (p *PostgresRepo) sortSets(sets []types.Set) []types.Set {
+	sorted := sets
+
+	sort.Slice(sets, func(i, j int) bool {
+		return sets[i].ID < sets[j].ID
+	})
+
+	return sorted
 }
 
 func (p *PostgresRepo) DeleteWorkout(workoutId uint64) error {

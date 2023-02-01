@@ -2,13 +2,14 @@ package postgres
 
 import "github.com/markusryoti/werk/internal/types"
 
-func (p *PostgresRepo) AddMovementSet(movementId uint64, set types.Set) error {
-	_, err := p.db.NamedExec(`INSERT INTO movement_set (reps, weight, movement_id, user_id) VALUES (:reps, :weight, :movementId, :userId)`,
+func (p *PostgresRepo) AddMovementSet(workoutMovementId uint64, set types.Set) error {
+	_, err := p.db.NamedExec(`INSERT INTO movement_set (reps, weight, workout_movement_id, user_id) 
+                                VALUES (:reps, :weight, :workoutMovementId, :userId)`,
 		map[string]interface{}{
-			"reps":       set.Reps,
-			"weight":     set.Weight,
-			"movementId": movementId,
-			"userId":     set.User,
+			"reps":              set.Reps,
+			"weight":            set.Weight,
+			"userId":            set.User,
+			"workoutMovementId": workoutMovementId,
 		})
 
 	if err != nil {
@@ -21,7 +22,7 @@ func (p *PostgresRepo) AddMovementSet(movementId uint64, set types.Set) error {
 func (p *PostgresRepo) GetMovementSet(movementSetId uint64) (types.Set, error) {
 	var set types.Set
 
-	row := p.db.QueryRow("SELECT id, user_id FROM movement_set WHERE id = $1", movementSetId)
+	row := p.db.QueryRowx("SELECT id, user_id FROM movement_set WHERE id = $1", movementSetId)
 	err := row.Scan(&set.ID, &set.User)
 
 	return set, err

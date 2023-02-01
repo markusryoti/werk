@@ -2,23 +2,31 @@ package rest
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/markusryoti/werk/internal/types"
 )
 
-var (
-	ErrBadRequest    = errors.New("bad request")
-	ErrNotAuthorized = errors.New("not authorized")
-)
-
-type AddWorkoutRequest struct {
-	WorkoutName string
+func (s *Handler) registerWorkoutRoutes() {
+	s.router.Route("/workouts", func(r chi.Router) {
+		r.Use(s.isAuthenticated)
+		r.Get("/", s.getWorkoutsByUser)
+		r.Post("/", s.addWorkoutHandler)
+		r.Get("/{workoutId}", s.getWorkout)
+		r.Post("/{workoutId}/addMovement", s.addMovementToWorkout)
+		r.Get("/{workoutId}/workoutMovements", s.getMovementsFromWorkout)
+		r.Post("/{workoutId}/workoutMovements/{movementId}", s.addSet)
+		r.Delete("/{workoutId}", s.removeWorkout)
+	})
 }
 
-func (s *Router) addWorkoutHandler(w http.ResponseWriter, r *http.Request) {
+type AddWorkoutRequest struct {
+	WorkoutName string `json:"workoutName"`
+}
+
+func (s *Handler) addWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var newWorkout AddWorkoutRequest
@@ -29,9 +37,9 @@ func (s *Router) addWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uid, _ := r.Context().Value(userKey).(string)
+	userId := s.getCurrentUser(r)
 
-	err = s.svc.AddNewWorkout(uid, newWorkout.WorkoutName)
+	err = s.svc.AddNewWorkout(userId, newWorkout.WorkoutName)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't add a workout", err, http.StatusInternalServerError)
 		return
@@ -40,8 +48,10 @@ func (s *Router) addWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	JsonMessageResponse(w, "workout added", http.StatusOK)
 }
 
-func (s *Router) getAllWorkouts(w http.ResponseWriter, r *http.Request) {
-	workouts, err := s.svc.GetAllWorkouts()
+func (s *Handler) getWorkoutsByUser(w http.ResponseWriter, r *http.Request) {
+	userId := s.getCurrentUser(r)
+
+	workouts, err := s.svc.GetWorkoutsByUser(userId)
 	if err != nil {
 		JsonErrorResponse(w, "couldn't get workouts", err, http.StatusInternalServerError)
 		return
@@ -50,7 +60,7 @@ func (s *Router) getAllWorkouts(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(w, workouts, http.StatusOK)
 }
 
-func (s *Router) getWorkout(w http.ResponseWriter, r *http.Request) {
+func (s *Handler) getWorkout(w http.ResponseWriter, r *http.Request) {
 	workoutIdStr := chi.URLParam(r, "workoutId")
 
 	if workoutIdStr == "" {
@@ -73,7 +83,52 @@ func (s *Router) getWorkout(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(w, workout, http.StatusOK)
 }
 
-func (s *Router) removeWorkout(w http.ResponseWriter, r *http.Request) {
+type AddMovementRequest struct {
+	MovementName string `json:"movementName"`
+}
+
+func (s *Handler) addMovementToWorkout(w http.ResponseWriter, r *http.Request) {
+	workoutIdStr := chi.URLParam(r, "workoutId")
+
+	if workoutIdStr == "" {
+		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	workoutId, err := strconv.ParseUint(workoutIdStr, 10, 64)
+	if err != nil {
+		JsonErrorResponse(w, "invalid workoutId parameter", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	var reqBody AddMovementRequest
+
+	defer r.Body.Close()
+
+	err = json.NewDecoder(r.Body).Decode(&reqBody)
+	if err != nil {
+		JsonErrorResponse(w, "couldn't decode request body", err, http.StatusBadRequest)
+		return
+	}
+
+	if reqBody.MovementName == "" {
+		JsonErrorResponse(w, "empty movement name", ErrBadRequest, http.StatusBadRequest)
+		return
+	}
+
+	userId := s.getCurrentUser(r)
+
+	err = s.svc.AddNewMovement(workoutId, types.Movement{
+		Name: reqBody.MovementName,
+		User: userId,
+	})
+	if err != nil {
+		JsonErrorResponse(w, "couldn't add new movement", err, http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Handler) removeWorkout(w http.ResponseWriter, r *http.Request) {
 	workoutIdStr := chi.URLParam(r, "workoutId")
 
 	if workoutIdStr == "" {
@@ -94,6 +149,7 @@ func (s *Router) removeWorkout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if workout.User != s.getCurrentUser(r) {
+		s.logger.Infow("users", "workoutUser", workout.User, "reqUser", s.getCurrentUser(r))
 		JsonErrorResponse(w, "not authorized", ErrNotAuthorized, http.StatusUnauthorized)
 		return
 	}

@@ -7,14 +7,13 @@ interface Props {
     movement: Movement
     workoutId: number
     getWorkout: () => void
-    key: string
 }
 
-export default function MovementCollapse({ movement, workoutId, getWorkout, key }: Props) {
+export default function MovementCollapse({ movement, workoutId, getWorkout }: Props) {
     return (
-        <div key={key} className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box mt-4 mb-4">
+        <div className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box mt-4 mb-4">
             <input type="checkbox" className="peer" />
-            <div className="collapse-title">
+            <div className="collapse-title text-xl font-medium">
                 {movement.name}
             </div>
             <div className="collapse-content flex flex-col align-center">

@@ -30,7 +30,7 @@ export default function AddWorkout() {
                         <input type="text" id="workoutName" className="input" onChange={e => setWorkoutName(e.target.value.trim())} />
                     </div>
                     <div className="flex justify-center p-2">
-                        <button type="submit" className="btn btn-primary">Add</button>
+                        <button type="submit" className="btn btn-primary w-full">Add</button>
                     </div>
                 </form>
             </div>

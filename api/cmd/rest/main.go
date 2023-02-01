@@ -35,7 +35,7 @@ func main() {
 
 	svc := service.NewService(repo)
 
-	handler := rest.NewRouter(router, svc, logger, authClient)
+	handler := rest.NewHandler(router, svc, logger, authClient)
 
 	s := &http.Server{
 		Addr:    ":8080",

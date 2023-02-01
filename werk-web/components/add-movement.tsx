@@ -26,12 +26,12 @@ export default function AddMovement({ workoutId, getWorkout }: Props) {
 
     return (
         <div className="card border border-base-300 bg-base-200 shadow-l p-4 mb-4">
-            <h3 className="card-title">Add movement</h3>
+            <h3 className="card-title text-xl font-medium">Add movement</h3>
             <form onSubmit={addMovement} className="flex flex-col">
-                <div className="p-2">
+                <div className="pt-2">
                     <input placeholder="Movement name" onChange={e => setMovementName(e.target.value)} value={movementName} className="input input-bordered w-full" />
                 </div>
-                <div className="p-2">
+                <div className="pt-2">
                     <button onClick={addMovement} className="btn btn-primary w-full">Add</button>
                 </div>
             </form>

@@ -20,7 +20,7 @@ func (u userCtxKey) String() string {
 
 var userKey = userCtxKey("uid")
 
-func (s *Router) isAuthenticated(next http.Handler) http.Handler {
+func (s *Handler) isAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 		parts := strings.Split(header, " ")
@@ -43,7 +43,7 @@ func (s *Router) isAuthenticated(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Router) getCurrentUser(r *http.Request) string {
+func (s *Handler) getCurrentUser(r *http.Request) string {
 	uid, _ := r.Context().Value(userKey).(string)
 	return uid
 }

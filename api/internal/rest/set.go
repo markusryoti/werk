@@ -9,12 +9,19 @@ import (
 	"github.com/markusryoti/werk/internal/types"
 )
 
-type AddSetRequest struct {
-	Reps   uint8 `json:"reps"`
-	Weight uint8 `json:"weight"`
+func (s *Handler) registerMovementSetRoutes() {
+	s.router.Route("/sets", func(r chi.Router) {
+		r.Use(s.isAuthenticated)
+		r.Delete("/{setId}", s.removeSet)
+	})
 }
 
-func (s *Router) addSet(w http.ResponseWriter, r *http.Request) {
+type AddSetRequest struct {
+	Reps   uint8 `json:"reps"`
+	Weight int   `json:"weight"`
+}
+
+func (s *Handler) addSet(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var reqBody AddSetRequest
@@ -42,7 +49,7 @@ func (s *Router) addSet(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Router) removeSet(w http.ResponseWriter, r *http.Request) {
+func (s *Handler) removeSet(w http.ResponseWriter, r *http.Request) {
 	setIdStr := chi.URLParam(r, "setId")
 
 	setId, err := strconv.ParseUint(setIdStr, 10, 64)
