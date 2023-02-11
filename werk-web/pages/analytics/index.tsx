@@ -23,14 +23,16 @@ export default function Analytics() {
     }
 
     return (
-        <div className="container mx-auto pt-8 p-1">
-            {movements.length > 0 && movements.map((movement: Movement) => {
-                return <div key={movement.id} className="card border border-base-300 bg-base-200 mt-2 p-3">
-                    <Link href={`/analytics/movements/${movement.id}`}>
-                        {movement.name}
-                    </Link>
-                </div>
-            })}
+        <div className="flex justify-center container mx-auto pt-8 p-1">
+            <div className="w-full md:w-1/2">
+                {movements.length > 0 && movements.map((movement: Movement) => {
+                    return <div key={movement.id} className="card border border-base-300 bg-base-200 mt-2 p-3">
+                        <Link href={`/analytics/movements/${movement.id}`}>
+                            {movement.name}
+                        </Link>
+                    </div>
+                })}
+            </div>
         </div >
     )
 }

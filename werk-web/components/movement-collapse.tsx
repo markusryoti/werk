@@ -1,4 +1,4 @@
-import { Movement } from "../pages/workouts"
+import { Movement } from "../pages/types"
 import AddSet from "./add-set"
 import RemoveMovement from "./remove-movement"
 import RemoveSet from "./remove-set"
@@ -11,7 +11,7 @@ interface Props {
 
 export default function MovementCollapse({ movement, workoutId, getWorkout }: Props) {
     return (
-        <div className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box mt-4 mb-4">
+        <div className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box mt-2 mb-2">
             <input type="checkbox" className="peer" />
             <div className="collapse-title text-xl font-medium">
                 {movement.name}

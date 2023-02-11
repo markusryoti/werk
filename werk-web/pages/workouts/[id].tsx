@@ -41,21 +41,23 @@ export default function WorkoutDetail() {
     }
 
     return (
-        <div className="container mx-auto mt-8 p-1">
-            <div className="mt-4 mb-4 p-2">
-                <h2 className="text-2xl font-bold">{parseDate(workout.date)}</h2>
-                <h3 className="text-xl">{workout.name}</h3>
+        <div className="flex justify-center container mx-auto mt-8 p-1">
+            <div className="flex flex-col w-full md:w-1/2">
+                <div className="mt-4 mb-4 p-2">
+                    <h2 className="text-2xl font-bold">{parseDate(workout.date)}</h2>
+                    <h3 className="text-xl">{workout.name}</h3>
+                </div>
+                {workout && workout.movements.map((movement) => {
+                    return <MovementCollapse
+                        movement={movement}
+                        workoutId={workout.id}
+                        getWorkout={getWorkout}
+                        key={`${movement.id}`}
+                    />
+                })}
+                <AddMovement workoutId={workout.id} getWorkout={getWorkout} />
+                <RemoveWorkout workoutId={workout.id} />
             </div>
-            {workout && workout.movements.map((movement) => {
-                return <MovementCollapse
-                    movement={movement}
-                    workoutId={workout.id}
-                    getWorkout={getWorkout}
-                    key={`${movement.id}`}
-                />
-            })}
-            <AddMovement workoutId={workout.id} getWorkout={getWorkout} />
-            <RemoveWorkout workoutId={workout.id} />
         </div >
     )
 }

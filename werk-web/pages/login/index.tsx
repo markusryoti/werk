@@ -16,7 +16,6 @@ export default function Login() {
         }
     }, [authUser, router])
 
-
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
 
@@ -34,7 +33,8 @@ export default function Login() {
     return (
         <div className="flex justify-center">
             <div className="card w-full md:w-1/2 bg-base-300 shadow-xl mt-16 m-2">
-                <form onSubmit={onSubmit} className="p-8">
+                <h1 className='text-xl p-2'>Let's get started</h1>
+                <form onSubmit={onSubmit} className="p-4">
                     <div className="flex flex-col p-1">
                         <label htmlFor="email" className="">Email</label>
                         <input id="email" type="text" onChange={e => setEmail(e.target.value.trim())} className="input" />

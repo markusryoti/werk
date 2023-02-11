@@ -41,7 +41,7 @@ export default function MovementAnalytics() {
                     const { date, max } = point
                     return {
                         date: new Date(date).toLocaleDateString(),
-                        max
+                        max: max.toFixed(2)
                     }
                 })
 
@@ -77,19 +77,19 @@ export default function MovementAnalytics() {
                     <YAxis />
                     <Tooltip />
                     <Legend verticalAlign="top" height={36} />
-                    <Line type="monotone" dataKey="max" stroke="#82ca9d" strokeWidth={3} />
+                    <Line type="monotone" dataKey="max" stroke="#641ae6" strokeWidth={3} />
                 </LineChart>
             </ResponsiveContainer>
 
             <div className="flex flex-wrap justify-center mt-8">
-                <div className="stats shadow w-full md:w-1/2">
+                <div className="stats shadow w-full md:w-1/2 m-2 bg-base-200">
                     <div className="stat">
                         <div className="stat-title">Current Max</div>
                         <div className="stat-value">{stats.currentMax.max.toFixed(2)} kg</div>
-                        <div className="stat-desc">Your current estimate</div>
+                        <div className="stat-desc">Your most recent estimate</div>
                     </div>
                 </div>
-                <div className="stats shadow w-full md:w-1/2">
+                <div className="stats shadow w-full md:w-1/2 m-2 bg-base-200">
                     <div className="stat">
                         <div className="stat-title">All Time Max</div>
                         <div className="stat-value">{stats.allTimeMax.max.toFixed(2)} kg</div>

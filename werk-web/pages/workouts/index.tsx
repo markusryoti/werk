@@ -7,7 +7,7 @@ interface Props {
 
 export default function Workouts({ workouts }: Props) {
     return (
-        <div className="container mx-auto pt-8 p-1">
+        <div className="container flex flex-col items-center pt-8 p-1 m-auto">
             {workouts.length > 0
                 ? workouts.map((w: IWorkout, i: number) => <WorkoutListView key={i} workout={w} />)
                 : <p>No workouts</p>}
