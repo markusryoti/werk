@@ -1,13 +1,19 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { useAuth } from "../pages/context/AuthUserContext"
 
 export default function Footer() {
     const router = useRouter()
+    const { authUser } = useAuth()
 
     const path = router.pathname.replace("/", "")
 
     const getClassName = (button: string) => {
         return path === button ? "text-primary active" : "text-primary"
+    }
+
+    if (!authUser) {
+        return null
     }
 
     return (

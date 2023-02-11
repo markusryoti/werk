@@ -28,17 +28,19 @@ export default function AddSet({ workoutId, movementId, updateWorkout }: Props) 
 
     return (
         <form onSubmit={(e) => addSet(movementId, e)} className="flex flex-col md:flex-row p-2">
-            <div className="flex flex-col">
+            <div className="flex flex-col p-1">
                 <label htmlFor="reps">Reps</label>
                 <input value={reps} onChange={e => setReps(parseInt(e.target.value))} id="reps" type="number" className="input" />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col p-1">
                 <label htmlFor="weight">Weight</label>
                 <input value={weight} onChange={e => setWeight(parseInt(e.target.value))} id="weight" type="number" className="input" />
             </div>
-            <button className="btn btn-secondary mt-4">
-                Add Set
-            </button>
+            <div className="flex items-end p-1">
+                <button className="btn btn-secondary mt-4">
+                    Add Set
+                </button>
+            </div>
         </form>
     )
 }

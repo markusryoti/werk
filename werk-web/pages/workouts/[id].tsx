@@ -6,18 +6,25 @@ import RemoveWorkout from "../../components/remove-workout"
 import Spinner from "../../components/spinner"
 import { useClientRequest } from "../../hooks/use-request"
 import { parseDate } from "../../utils/date"
+import { useAuth } from "../context/AuthUserContext"
 import { IWorkout } from "../types"
 
 export default function WorkoutDetail() {
     const [workout, setWorkout] = useState<IWorkout>()
 
     const router = useRouter()
+    const { id } = router.query
     const { doRequest } = useClientRequest()
 
-    const { id } = router.query
+    const { authUser } = useAuth()
+
 
     useEffect(() => {
-        getWorkout()
+        if (authUser) {
+            getWorkout()
+        } else {
+            router.push("/login")
+        }
     }, [])
 
     const getWorkout = () => {

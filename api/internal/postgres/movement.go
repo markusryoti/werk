@@ -237,11 +237,38 @@ func (p *PostgresRepo) GetMovementStats(movementId uint64) (types.MovementStats,
 		return estimatedMaxes[i].Date.Before(estimatedMaxes[j].Date)
 	})
 
+	movement, err := p.GetMovement(movementId)
+	if err != nil {
+		return stats, err
+	}
+
+	currentMax := getCurrentMax(estimatedMaxes)
+	allTimeMax := getAllTimeMax(estimatedMaxes)
+
 	stats = types.MovementStats{
 		EstimatedMaxes: estimatedMaxes,
+		Movement:       movement,
+		CurrentMax:     currentMax,
+		AllTimeMax:     allTimeMax,
 	}
 
 	return stats, nil
+}
+
+func getAllTimeMax(maxes []types.EstimatedMax) types.EstimatedMax {
+	var max types.EstimatedMax
+
+	for _, m := range maxes {
+		if m.Max > max.Max {
+			max = m
+		}
+	}
+
+	return max
+}
+
+func getCurrentMax(maxes []types.EstimatedMax) types.EstimatedMax {
+	return maxes[len(maxes)-1]
 }
 
 func (p *PostgresRepo) DeleteMovement(movementId uint64) error {
@@ -256,8 +283,8 @@ func (p *PostgresRepo) DeleteMovement(movementId uint64) error {
 func (p *PostgresRepo) GetMovement(movementId uint64) (types.Movement, error) {
 	var movement types.Movement
 
-	row := p.db.QueryRowx("SELECT id, user_id FROM movement WHERE id = $1", movementId)
-	err := row.Scan(&movement.ID, &movement.User)
+	row := p.db.QueryRowx("SELECT id, name, user_id FROM movement WHERE id = $1", movementId)
+	err := row.Scan(&movement.ID, &movement.Name, &movement.User)
 
 	return movement, err
 }

@@ -27,6 +27,8 @@ type Set struct {
 type MovementStats struct {
 	Movement       Movement       `json:"movement"`
 	EstimatedMaxes []EstimatedMax `json:"estimatedMaxes"`
+	CurrentMax     EstimatedMax   `json:"currentMax"`
+	AllTimeMax     EstimatedMax   `json:"allTimeMax"`
 }
 
 type EstimatedMax struct {

@@ -10,9 +10,9 @@ export default function Nav() {
             </div>
             {authUser && (
                 <div className="flex-1 justify-end">
-                    <button className="btn btn-ghost">
+                    <Link href="/profile" className="btn btn-ghost">
                         {authUser.email}
-                    </button>
+                    </Link>
                 </div>
             )}
         </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "../pages/context/AuthUserContext"
 
 export interface ClientRequestParams {
@@ -7,12 +8,16 @@ export interface ClientRequestParams {
 }
 
 export function useClientRequest() {
+    const [waiting, setWaiting] = useState(true)
+
     const { getToken } = useAuth()
 
     const doRequest = async (url: string, method: string, body: any = undefined) => {
+        setWaiting(true)
+
         const token = await getToken()
 
-        return await fetch(url, {
+        const res = await fetch(url, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -20,9 +25,13 @@ export function useClientRequest() {
             },
             body: JSON.stringify(body)
         })
+
+        setWaiting(false)
+        return res
     }
 
     return {
-        doRequest
+        doRequest,
+        waiting,
     }
 }

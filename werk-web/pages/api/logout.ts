@@ -6,7 +6,7 @@ type ResponseBody = {
 }
 
 export default function handler(_: NextApiRequest, res: NextApiResponse<ResponseBody>) {
-    setCookie(res, "session", "", { expires: new Date(0) })
+    setCookie(res, "session", "", { path: '/', expires: new Date(0) })
 
     res.status(200).json({ message: 'session destroyed' })
 }

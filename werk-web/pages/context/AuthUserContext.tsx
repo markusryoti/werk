@@ -10,10 +10,11 @@ import {
 
 export interface AuthContext {
     authUser: AuthUser | null;
-    login: (email: string, password: string) => Promise<UserCredential>
+    login: (email: string, password: string) => Promise<void>
     signup: (email: string, password: string) => Promise<UserCredential>
     logout: () => Promise<void>
     getToken: () => Promise<string | undefined>
+    loading: boolean
 }
 
 export type AuthUser = {
@@ -37,15 +38,19 @@ export const AuthContextProvider = ({
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
+                console.log('auth state changed, has user')
+
                 setAuthUser({
                     uid: user.uid,
                     email: user.email,
                     displayName: user.displayName
                 })
 
+                console.log('starting a session')
                 const token = await user.getIdToken()
                 await doSessionLogin(token)
             } else {
+                console.log('resetting auth user')
                 setAuthUser(null)
                 await doSessionLogout()
             }
@@ -58,30 +63,33 @@ export const AuthContextProvider = ({
     }, [])
 
     const doSessionLogin = async (token: string) => {
-        const res = await fetch('/api/session', {
+        setLoading(true)
+
+        await fetch('/api/session', {
             method: 'post',
             body: JSON.stringify({ token }),
         })
-
-        const body = await res.json()
-        console.log(body)
     }
 
     const doSessionLogout = async () => {
+        setLoading(true)
         await fetch('/api/logout')
     }
 
     const signup = (email: string, password: string): Promise<UserCredential> => {
+        setLoading(true)
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
-    const login = (email: string, password: string): Promise<UserCredential> => {
-        return signInWithEmailAndPassword(auth, email, password)
+    const login = async (email: string, password: string) => {
+        setLoading(true)
+
+        await signInWithEmailAndPassword(auth, email, password)
     }
 
     const logout = async () => {
-        setAuthUser(null)
         await signOut(auth)
+        await doSessionLogout()
     }
 
     const getToken = async (): Promise<string | undefined> => {
@@ -89,7 +97,7 @@ export const AuthContextProvider = ({
     }
 
     return (
-        <authContext.Provider value={{ authUser, login, signup, logout, getToken }}>
+        <authContext.Provider value={{ authUser, login, signup, logout, getToken, loading }}>
             {loading ? null : children}
         </authContext.Provider>
     )

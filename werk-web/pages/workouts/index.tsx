@@ -1,7 +1,6 @@
 import WorkoutListView from "../../components/workout-list-view";
 import { IWorkout } from "../types";
 
-
 interface Props {
     workouts: IWorkout[]
 }
@@ -25,6 +24,14 @@ export async function getServerSideProps(context: any) {
             'Authorization': `Bearer ${token}`
         }
     })
+
+    if (res.status === 401) {
+        return {
+            redirect: {
+                destination: '/login'
+            }
+        }
+    }
 
     const workouts = await res.json()
 
