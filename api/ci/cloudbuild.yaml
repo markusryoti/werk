@@ -24,7 +24,7 @@
    - '--set-env-vars'
    - 'DB_PORT=$$DB_PORT_DEV'
    - '--region'
-   - 'eu-north1'
+   - 'europe-north1'
 
  images:
  - 'gcr.io/$PROJECT_ID/werk-backend-dev:$COMMIT_SHA'
