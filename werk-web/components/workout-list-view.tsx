@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { IWorkout } from "../pages/types"
+import { IWorkout } from "../lib/types"
 import { parseDate } from "../utils/date"
 
 interface Props {

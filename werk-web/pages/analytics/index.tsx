@@ -2,7 +2,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import Spinner from "../../components/spinner"
 import { useClientRequest } from "../../hooks/use-request"
-import { Movement } from "../types"
+import { Movement } from "../../lib/types"
 
 export default function Analytics() {
     const [movements, setMovements] = useState<Movement[]>([])

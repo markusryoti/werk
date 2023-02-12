@@ -1,4 +1,4 @@
-import { Movement } from "../pages/types"
+import { Movement } from "../lib/types"
 import AddSet from "./add-set"
 import RemoveMovement from "./remove-movement"
 import RemoveSet from "./remove-set"

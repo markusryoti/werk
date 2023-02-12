@@ -2,9 +2,9 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { useClientRequest } from "../../../hooks/use-request"
 
-import { Movement } from "../../types"
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import Spinner from "../../../components/spinner";
+import { Movement } from "../../../lib/types";
 
 type MovementStats = {
     movement: Movement;

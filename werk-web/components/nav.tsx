@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { useAuth } from "../pages/context/AuthUserContext"
+import { useAuth } from "../context/AuthUserContext"
 
 export default function Nav() {
     const { authUser } = useAuth()

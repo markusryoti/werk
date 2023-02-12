@@ -1,5 +1,5 @@
 import { useClientRequest } from "../hooks/use-request";
-import { Movement } from "../pages/workouts"
+import { Movement } from "../lib/types";
 
 interface Props {
     movement: Movement;

@@ -4,10 +4,10 @@ import AddMovement from "../../components/add-movement"
 import MovementCollapse from "../../components/movement-collapse"
 import RemoveWorkout from "../../components/remove-workout"
 import Spinner from "../../components/spinner"
+import { useAuth } from "../../context/AuthUserContext"
 import { useClientRequest } from "../../hooks/use-request"
+import { IWorkout } from "../../lib/types"
 import { parseDate } from "../../utils/date"
-import { useAuth } from "../context/AuthUserContext"
-import { IWorkout } from "../types"
 
 export default function WorkoutDetail() {
     const [workout, setWorkout] = useState<IWorkout>()

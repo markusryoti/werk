@@ -1,5 +1,5 @@
 import WorkoutListView from "../../components/workout-list-view";
-import { IWorkout } from "../types";
+import { IWorkout } from "../../lib/types";
 
 interface Props {
     workouts: IWorkout[]

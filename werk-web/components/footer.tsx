@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useAuth } from "../pages/context/AuthUserContext"
+import { useAuth } from "../context/AuthUserContext"
 
 export default function Footer() {
     const router = useRouter()

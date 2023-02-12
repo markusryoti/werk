@@ -1,5 +1,5 @@
 import { useClientRequest } from "../hooks/use-request"
-import { Set } from "../pages/workouts"
+import { Set } from "../lib/types"
 
 interface Props {
     set: Set

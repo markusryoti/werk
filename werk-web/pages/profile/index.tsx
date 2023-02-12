@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import React from 'react'
-import { useAuth } from '../context/AuthUserContext'
+import { useAuth } from '../../context/AuthUserContext'
 
 const Profile = () => {
     const router = useRouter()

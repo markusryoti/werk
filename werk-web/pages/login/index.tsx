@@ -1,7 +1,7 @@
 import React, { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { useAuth } from '../context/AuthUserContext'
 import Spinner from '../../components/spinner'
+import { useAuth } from '../../context/AuthUserContext'
 
 export default function Login() {
     const [email, setEmail] = useState('')

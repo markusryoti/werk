@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../pages/context/AuthUserContext"
+import { useAuth } from "../context/AuthUserContext";
 
 export interface ClientRequestParams {
     url: string;
