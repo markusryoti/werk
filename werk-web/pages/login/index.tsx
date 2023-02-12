@@ -14,7 +14,9 @@ export default function Login() {
         if (authUser) {
             router.push("/workouts")
         }
-    }, [authUser, router])
+
+        // eslint-disable-next-line
+    }, [authUser])
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()

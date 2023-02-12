@@ -16,7 +16,9 @@ export default function Analytics() {
             .then(res => res.json())
             .then(m => setMovements(m))
             .catch(err => console.error(err))
-    }, [doRequest])
+
+        // eslint-disable-next-line
+    }, [])
 
     if (waiting) {
         return <Spinner />

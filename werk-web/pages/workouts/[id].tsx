@@ -29,16 +29,12 @@ export default function WorkoutDetail() {
 
     useEffect(() => {
         if (authUser) {
-            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`;
-
-            doRequest(url, 'GET')
-                .then(res => res.json())
-                .then(w => setWorkout(w))
-                .catch(err => console.error(err))
+            getWorkout()
         } else {
             router.push("/login")
         }
-    }, [authUser, router, doRequest, id])
+        // eslint-disable-next-line
+    }, [])
 
 
     if (!workout) {

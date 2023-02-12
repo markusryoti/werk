@@ -48,7 +48,8 @@ export default function MovementAnalytics() {
                 setStats({ ...s, estimatedMaxes: chartData })
             })
             .catch(err => console.error(err))
-    }, [doRequest, id])
+        // eslint-disable-next-line
+    }, [])
 
     if (waiting) {
         return <Spinner />
