@@ -23,8 +23,8 @@ steps:
    - 'DB_HOST=DB_HOST_DEV:latest'
    - '--update-secrets'
    - 'DB_PORT=DB_PORT_DEV:latest'
-   - '--region'
    - '--allow-unauthenticated'
+   - '--region'
    - 'europe-north1'
 
 images:
