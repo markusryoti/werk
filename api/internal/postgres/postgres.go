@@ -20,8 +20,9 @@ func NewPostgresRepo(logger *zap.SugaredLogger) (*PostgresRepo, error) {
 	dbName := os.Getenv("DB_NAME")
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
 
-	db, err := sqlx.Connect("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", host, user, dbName, password))
+	db, err := sqlx.Connect("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s sslmode=disable", host, user, dbName, password, port))
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +33,4 @@ func NewPostgresRepo(logger *zap.SugaredLogger) (*PostgresRepo, error) {
 		db:     db,
 		logger: logger,
 	}, nil
-}
-
-func (p *PostgresRepo) RunMigrations() {
-
 }

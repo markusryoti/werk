@@ -9,7 +9,7 @@ export default function Footer() {
     const path = router.pathname.replace("/", "")
 
     const getClassName = (button: string) => {
-        return path === button ? "text-primary active" : "text-primary"
+        return path.indexOf(button) !== -1 ? "text-primary active" : "text-primary"
     }
 
     if (!authUser) {

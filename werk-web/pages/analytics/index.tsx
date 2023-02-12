@@ -27,7 +27,7 @@ export default function Analytics() {
             <div className="w-full md:w-1/2">
                 {movements.length > 0 && movements.map((movement: Movement) => {
                     return <div key={movement.id} className="card border border-base-300 bg-base-200 mt-2 p-3">
-                        <Link href={`/analytics/movements/${movement.id}`}>
+                        <Link href={`/analytics/movements/${movement.id}`} className="card-title">
                             {movement.name}
                         </Link>
                     </div>

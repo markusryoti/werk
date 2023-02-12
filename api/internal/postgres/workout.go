@@ -61,8 +61,8 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
           movement_set.weight
         FROM
           workout
-          JOIN workout_movement ON workout.id = workout_movement.workout_id
-          JOIN movement ON workout_movement.movement_id = movement.id
+          LEFT JOIN workout_movement ON workout.id = workout_movement.workout_id
+          LEFT JOIN movement ON workout_movement.movement_id = movement.id
           LEFT JOIN movement_set ON workout_movement.id = movement_set.workout_movement_id
         WHERE
           workout.id = $1
@@ -92,6 +92,8 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 		)
 
 		err = rows.Scan(&workout.Date, &workout.Name, &workout.User, &movementId, &movementName, &movementSetId, &reps, &weight)
+
+		p.logger.Info(workout)
 
 		if movementName != currentMovement.Name {
 			if currentMovement.Name != "" {

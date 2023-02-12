@@ -11,6 +11,7 @@ services:
       DB_USER: ${DB_USER:-devuser}
       DB_HOST: ${DB_HOST:-db}
       DB_PASSWORD: ${DB_PASSWORD:-dev123}
+      DB_PORT: 5432
 
     networks:
       - api

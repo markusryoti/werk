@@ -37,7 +37,7 @@ export default function AddSet({ workoutId, movementId, updateWorkout }: Props) 
                 <input value={weight} onChange={e => setWeight(parseInt(e.target.value))} id="weight" type="number" className="input" />
             </div>
             <div className="flex items-end p-1">
-                <button className="btn btn-secondary mt-4">
+                <button className="btn btn-secondary mt-4 w-full">
                     Add Set
                 </button>
             </div>

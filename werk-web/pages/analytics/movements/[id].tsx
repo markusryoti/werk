@@ -20,7 +20,7 @@ type RecentMovementDevelopment = {
 }
 
 type EstimatedMax = {
-    date: Date;
+    date: string | Date;
     max: number;
 }
 
@@ -74,7 +74,7 @@ export default function MovementAnalytics() {
                 <LineChart data={stats?.estimatedMaxes} margin={{ top: 10, right: 60, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="#243240" />
                     <XAxis dataKey="date" />
-                    <YAxis />
+                    <YAxis type="number" domain={['dataMin', 'dataMax']} />
                     <Tooltip />
                     <Legend verticalAlign="top" height={36} />
                     <Line type="monotone" dataKey="max" stroke="#641ae6" strokeWidth={3} />
@@ -82,18 +82,18 @@ export default function MovementAnalytics() {
             </ResponsiveContainer>
 
             <div className="flex flex-wrap justify-center mt-8">
-                <div className="stats shadow w-full md:w-1/2 m-2 bg-base-200">
+                <div className="stats shadow w-56 m-2 bg-base-200">
                     <div className="stat">
                         <div className="stat-title">Current Max</div>
                         <div className="stat-value">{stats.currentMax.max.toFixed(2)} kg</div>
-                        <div className="stat-desc">Your most recent estimate</div>
+                        <div className="stat-desc">{new Date(stats.currentMax.date).toLocaleDateString()}</div>
                     </div>
                 </div>
-                <div className="stats shadow w-full md:w-1/2 m-2 bg-base-200">
+                <div className="stats shadow w-56 m-2 bg-base-200">
                     <div className="stat">
                         <div className="stat-title">All Time Max</div>
                         <div className="stat-value">{stats.allTimeMax.max.toFixed(2)} kg</div>
-                        <div className="stat-desc">Your all time estimate</div>
+                        <div className="stat-desc">{new Date(stats.allTimeMax.date).toLocaleDateString()}</div>
                     </div>
                 </div>
             </div>
