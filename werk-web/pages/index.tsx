@@ -5,9 +5,9 @@ import styles from '../styles/Home.module.css'
 
 export default function Home() {
     const router = useRouter()
-    const { authUser } = useAuth()
+    const { authUser, loading } = useAuth()
 
-    if (authUser) {
+    if (authUser && !loading) {
         router.push("/workouts")
     }
 
