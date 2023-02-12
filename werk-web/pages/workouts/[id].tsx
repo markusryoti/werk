@@ -18,15 +18,6 @@ export default function WorkoutDetail() {
 
     const { authUser } = useAuth()
 
-
-    useEffect(() => {
-        if (authUser) {
-            getWorkout()
-        } else {
-            router.push("/login")
-        }
-    }, [])
-
     const getWorkout = () => {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`;
 
@@ -35,6 +26,20 @@ export default function WorkoutDetail() {
             .then(w => setWorkout(w))
             .catch(err => console.error(err))
     }
+
+    useEffect(() => {
+        if (authUser) {
+            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`;
+
+            doRequest(url, 'GET')
+                .then(res => res.json())
+                .then(w => setWorkout(w))
+                .catch(err => console.error(err))
+        } else {
+            router.push("/login")
+        }
+    }, [authUser, router, doRequest, id])
+
 
     if (!workout) {
         return <Spinner />

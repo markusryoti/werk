@@ -48,7 +48,7 @@ export default function MovementAnalytics() {
                 setStats({ ...s, estimatedMaxes: chartData })
             })
             .catch(err => console.error(err))
-    }, [])
+    }, [doRequest, id])
 
     if (waiting) {
         return <Spinner />
