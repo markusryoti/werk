@@ -32,7 +32,7 @@ export const AuthContextProvider = ({
     children: React.ReactNode
 }) => {
     const [authUser, setAuthUser] = useState<AuthUser | null>({} as AuthUser)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -44,7 +44,6 @@ export const AuthContextProvider = ({
                 })
             } else {
                 setAuthUser(null)
-                await doSessionLogout()
             }
         })
 
@@ -54,8 +53,6 @@ export const AuthContextProvider = ({
     }, [])
 
     const doSessionLogin = async (token: string) => {
-        setLoading(true)
-
         await fetch('/api/session', {
             method: 'post',
             body: JSON.stringify({ token }),
@@ -63,7 +60,6 @@ export const AuthContextProvider = ({
     }
 
     const doSessionLogout = async () => {
-        setLoading(true)
         await fetch('/api/logout')
     }
 

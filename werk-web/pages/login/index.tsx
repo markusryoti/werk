@@ -1,6 +1,7 @@
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useAuth } from '../../context/AuthUserContext'
+import Spinner from '../../components/spinner'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -8,6 +9,12 @@ export default function Login() {
 
     const router = useRouter()
     const { authUser, login, loading } = useAuth()
+
+    useEffect(() => {
+        if (authUser && !loading) {
+            router.push("/workouts")
+        }
+    }, [authUser, loading, router])
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
@@ -17,11 +24,10 @@ export default function Login() {
         }
 
         await login(email, password)
-        router.push("/workouts")
     }
 
-    if (authUser && !loading) {
-        router.push("/workouts")
+    if (authUser || loading) {
+        return <Spinner />
     }
 
     return (
