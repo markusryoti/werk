@@ -7,38 +7,24 @@ steps:
 
  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
    entrypoint: gcloud
-   secretEnv: ['DB_USER', 'DB_NAME', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT']
    args:
    - 'run'
    - 'deploy'
    - 'werk-backend-dev'
    - '--image'
    - 'gcr.io/$PROJECT_ID/werk-backend-dev:$COMMIT_SHA'
-   - '--set-env-vars'
-   - 'DB_USER=$$DB_USER'
-   - '--set-env-vars'
-   - 'DB_NAME=$$DB_NAME'
-   - '--set-env-vars'
-   - 'DB_PASSWORD=$$DB_PASSWORD'
-   - '--set-env-vars'
-   - 'DB_HOST=$$DB_HOST'
-   - '--set-env-vars'
-   - 'DB_PORT=$$DB_PORT'
+   - '--update-secrets'
+   - 'DB_USER=DB_USER_DEV:latest'
+   - '--update-secrets'
+   - 'DB_NAME=DB_NAME_DEV:latest'
+   - '--update-secrets'
+   - 'DB_PASSWORD=DB_PASSWORD_DEV:latest'
+   - '--update-secrets'
+   - 'DB_HOST=DB_HOST_DEV:latest'
+   - '--update-secrets'
+   - 'DB_PORT=DB_PORT_DEV:latest'
    - '--region'
    - 'europe-north1'
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/$PROJECT_ID/secrets/DB_USER_DEV/versions/1
-      env: 'DB_USER'
-    - versionName: projects/$PROJECT_ID/secrets/DB_NAME_DEV/versions/1
-      env: 'DB_NAME'
-    - versionName: projects/$PROJECT_ID/secrets/DB_PASSWORD_DEV/versions/1
-      env: 'DB_PASSWORD'
-    - versionName: projects/$PROJECT_ID/secrets/DB_HOST_DEV/versions/1
-      env: 'DB_HOST'
-    - versionName: projects/$PROJECT_ID/secrets/DB_PORT_DEV/versions/1
-      env: 'DB_PORT'
 
 images:
   - 'gcr.io/$PROJECT_ID/werk-backend-dev:$COMMIT_SHA'
