@@ -4,14 +4,13 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    UserCredential,
 } from 'firebase/auth'
 import { auth } from '../config/firebase';
 
 export interface AuthContext {
     authUser: AuthUser | null;
     login: (email: string, password: string) => Promise<void>
-    signup: (email: string, password: string) => Promise<UserCredential>
+    signup: (email: string, password: string) => Promise<void>
     logout: () => Promise<void>
     getToken: () => Promise<string | undefined>
     loading: boolean
@@ -38,23 +37,15 @@ export const AuthContextProvider = ({
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log('auth state changed, has user')
-
                 setAuthUser({
                     uid: user.uid,
                     email: user.email,
                     displayName: user.displayName
                 })
-
-                console.log('starting a session')
-                const token = await user.getIdToken()
-                await doSessionLogin(token)
             } else {
-                console.log('resetting auth user')
                 setAuthUser(null)
                 await doSessionLogout()
             }
-            setLoading(false)
         })
 
         return () => {
@@ -76,15 +67,24 @@ export const AuthContextProvider = ({
         await fetch('/api/logout')
     }
 
-    const signup = (email: string, password: string): Promise<UserCredential> => {
+    const signup = async (email: string, password: string): Promise<void> => {
         setLoading(true)
-        return createUserWithEmailAndPassword(auth, email, password)
+
+        const userCreds = await createUserWithEmailAndPassword(auth, email, password)
+        const token = await userCreds.user.getIdToken(true)
+        await doSessionLogin(token)
+
+        setLoading(false)
     }
 
     const login = async (email: string, password: string) => {
         setLoading(true)
 
-        await signInWithEmailAndPassword(auth, email, password)
+        const userCreds = await signInWithEmailAndPassword(auth, email, password)
+        const token = await userCreds.user.getIdToken(true)
+        await doSessionLogin(token)
+
+        setLoading(false)
     }
 
     const logout = async () => {
@@ -93,12 +93,14 @@ export const AuthContextProvider = ({
     }
 
     const getToken = async (): Promise<string | undefined> => {
-        return auth.currentUser?.getIdToken(true)
+        const token = await auth.currentUser?.getIdToken(true)
+        await doSessionLogin(token!)
+        return token
     }
 
     return (
         <authContext.Provider value={{ authUser, login, signup, logout, getToken, loading }}>
-            {loading ? null : children}
+            {children}
         </authContext.Provider>
     )
 }

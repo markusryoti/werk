@@ -1,6 +1,5 @@
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import { useRouter } from 'next/router'
-import Spinner from '../../components/spinner'
 import { useAuth } from '../../context/AuthUserContext'
 
 export default function Login() {
@@ -10,14 +9,6 @@ export default function Login() {
     const router = useRouter()
     const { authUser, login, loading } = useAuth()
 
-    useEffect(() => {
-        if (authUser) {
-            router.push("/workouts")
-        }
-
-        // eslint-disable-next-line
-    }, [authUser])
-
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
 
@@ -26,10 +17,11 @@ export default function Login() {
         }
 
         await login(email, password)
+        router.push("/workouts")
     }
 
-    if (loading) {
-        return <Spinner />
+    if (authUser && !loading) {
+        router.push("/workouts")
     }
 
     return (

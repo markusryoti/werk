@@ -93,8 +93,6 @@ func (p *PostgresRepo) GetWorkout(workoutId uint64) (types.Workout, error) {
 
 		err = rows.Scan(&workout.Date, &workout.Name, &workout.User, &movementId, &movementName, &movementSetId, &reps, &weight)
 
-		p.logger.Info(workout)
-
 		if movementName != currentMovement.Name {
 			if currentMovement.Name != "" {
 				currentMovement.Sets = p.sortSets(currentMovement.Sets)
