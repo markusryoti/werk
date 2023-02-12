@@ -13,6 +13,7 @@ steps:
    - 'werk-ui-dev'
    - '--image'
    - 'gcr.io/$PROJECT_ID/werk-ui-dev:$COMMIT_SHA'
+   - '--allow-unauthenticated'
    - '--region'
    - 'europe-north1'
 
