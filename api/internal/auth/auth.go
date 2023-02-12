@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	firebase "firebase.google.com/go"
@@ -16,6 +17,11 @@ type Client struct {
 }
 
 func NewClient(ctx context.Context, logger *zap.SugaredLogger) (*Client, error) {
+	if os.Getenv("ENVIRONMENT") == "dev" {
+		logger.Infow("is dev env")
+		os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./secrets/serviceAccountKey.json")
+	}
+
 	app, err := firebase.NewApp(ctx, nil)
 	if err != nil {
 		logger.Fatalw("error initializing app", "error", err)

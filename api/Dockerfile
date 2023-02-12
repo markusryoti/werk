@@ -9,8 +9,6 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-ENV GOOGLE_APPLICATION_CREDENTIALS "./secrets/serviceAccountKey.json"
-
 RUN go build -v /app/cmd/rest/main.go
 
 CMD ["/app/main"]
