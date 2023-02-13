@@ -6,7 +6,7 @@ import RemoveWorkout from "../../components/remove-workout"
 import Spinner from "../../components/spinner"
 import { useAuth } from "../../context/AuthUserContext"
 import { useClientRequest } from "../../hooks/use-request"
-import { IWorkout } from "../../lib/types"
+import { ISet, IWorkout } from "../../lib/types"
 import { parseDate } from "../../utils/date"
 
 export default function WorkoutDetail() {
@@ -18,15 +18,6 @@ export default function WorkoutDetail() {
 
     const { authUser } = useAuth()
 
-    const getWorkout = () => {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`;
-
-        doRequest(url, 'GET')
-            .then(res => res.json())
-            .then(w => setWorkout(w))
-            .catch(err => console.error(err))
-    }
-
     useEffect(() => {
         if (authUser) {
             getWorkout()
@@ -36,6 +27,33 @@ export default function WorkoutDetail() {
         // eslint-disable-next-line
     }, [])
 
+    const getWorkout = () => {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${id}`;
+
+        doRequest(url, 'GET')
+            .then(res => res.json())
+            .then(w => setWorkout(w))
+            .catch(err => console.error(err))
+    }
+
+    const addSetToMovement = (movementId: number, newSet: ISet) => {
+        if (!workout) return
+
+        console.log(newSet)
+
+        const updatedMovements = workout.movements.map(movement => {
+            if (movement.id === movementId) {
+                movement.sets.push(newSet)
+            }
+
+            return movement
+        })
+
+        setWorkout({
+            ...workout,
+            movements: updatedMovements
+        })
+    }
 
     if (!workout) {
         return <Spinner />
@@ -53,6 +71,7 @@ export default function WorkoutDetail() {
                         movement={movement}
                         workoutId={workout.id}
                         getWorkout={getWorkout}
+                        addSetToMovement={addSetToMovement}
                         key={`${movement.id}`}
                     />
                 })}

@@ -10,9 +10,9 @@ type Storage interface {
 	GetMovementsByUser(userId string) ([]types.Movement, error)
 	GetMovementStats(movementId uint64) (types.MovementStats, error)
 	GetWorkoutsByUser(userId string) ([]types.Workout, error)
-	AddNewMovement(workoutId uint64, newMovement types.Movement) error
+	AddNewMovement(workoutId uint64, newMovement types.Movement) (types.Movement, error)
 	GetMovementsFromWorkout(workoutId uint64) ([]types.Movement, error)
-	AddMovementSet(movementId uint64, set types.Set) error
+	AddMovementSet(movementId uint64, set types.Set) (types.Set, error)
 	DeleteWorkout(workoutId uint64) error
 	DeleteMovement(movementId uint64) error
 	DeleteMovementSet(movementSetId uint64) error

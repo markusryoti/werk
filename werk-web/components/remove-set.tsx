@@ -1,8 +1,8 @@
 import { useClientRequest } from "../hooks/use-request"
-import { Set } from "../lib/types"
+import { ISet } from "../lib/types"
 
 interface Props {
-    set: Set
+    set: ISet
     updateWorkout: () => void;
 }
 

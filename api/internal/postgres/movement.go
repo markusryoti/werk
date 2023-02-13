@@ -9,7 +9,7 @@ import (
 	"github.com/markusryoti/werk/internal/types"
 )
 
-func (p *PostgresRepo) AddNewMovement(workoutId uint64, newMovement types.Movement) error {
+func (p *PostgresRepo) AddNewMovement(workoutId uint64, newMovement types.Movement) (types.Movement, error) {
 	var (
 		movement Movement
 		err      error
@@ -20,22 +20,25 @@ func (p *PostgresRepo) AddNewMovement(workoutId uint64, newMovement types.Moveme
 		if err == sql.ErrNoRows {
 			movement, err = p.addMovement(newMovement)
 			if err != nil {
-				return err
+				return types.Movement{}, err
 			}
 		} else {
 			p.logger.Errorw("Unexpected error getting movement", "error", err)
-			return err
+			return types.Movement{}, err
 		}
 	}
 
 	_, err = p.getMovementFromWorkout(movement.ID, workoutId)
 	if err == nil {
-		return nil
+		return types.Movement{}, nil
 	}
 
 	err = p.addMovementToWorkout(movement.ID, workoutId, newMovement.User)
+	if err != nil {
+		return types.Movement{}, err
+	}
 
-	return err
+	return types.Movement{}, err
 }
 
 func (p *PostgresRepo) getMovement(m types.Movement) (Movement, error) {

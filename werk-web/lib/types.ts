@@ -8,10 +8,10 @@ export interface IWorkout {
 export interface Movement {
     id: number;
     name: string;
-    sets: Set[]
+    sets: ISet[]
 }
 
-export interface Set {
+export interface ISet {
     id: number;
     reps: number;
     weight: number;

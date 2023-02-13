@@ -1,4 +1,4 @@
-import { Movement } from "../lib/types"
+import { ISet, Movement } from "../lib/types"
 import AddSet from "./add-set"
 import RemoveMovement from "./remove-movement"
 import RemoveSet from "./remove-set"
@@ -7,9 +7,10 @@ interface Props {
     movement: Movement
     workoutId: number
     getWorkout: () => void
+    addSetToMovement: (movementId: number, newSet: ISet) => void
 }
 
-export default function MovementCollapse({ movement, workoutId, getWorkout }: Props) {
+export default function MovementCollapse({ movement, workoutId, getWorkout, addSetToMovement }: Props) {
     return (
         <div className="collapse collapse-arrow border border-base-300 bg-base-200 rounded-box mt-2 mb-2">
             <input type="checkbox" className="peer" />
@@ -44,9 +45,17 @@ export default function MovementCollapse({ movement, workoutId, getWorkout }: Pr
                     </table>
                 ) : <p>No sets</p>}
                 <div className="divider"></div>
-                <AddSet workoutId={workoutId} movementId={movement.id} updateWorkout={getWorkout} />
+                <AddSet
+                    workoutId={workoutId}
+                    movementId={movement.id}
+                    updateWorkout={getWorkout}
+                    addSetToMovement={addSetToMovement}
+                />
                 <div className="divider"></div>
-                <RemoveMovement movement={movement} updateWorkout={getWorkout} />
+                <RemoveMovement
+                    movement={movement}
+                    updateWorkout={getWorkout}
+                />
             </div>
         </div>
     )

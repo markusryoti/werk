@@ -2,28 +2,33 @@ package postgres
 
 import "github.com/markusryoti/werk/internal/types"
 
-func (p *PostgresRepo) AddMovementSet(workoutMovementId uint64, set types.Set) error {
-	_, err := p.db.NamedExec(`INSERT INTO movement_set (reps, weight, workout_movement_id, user_id) 
-                                VALUES (:reps, :weight, :workoutMovementId, :userId)`,
-		map[string]interface{}{
-			"reps":              set.Reps,
-			"weight":            set.Weight,
-			"userId":            set.User,
-			"workoutMovementId": workoutMovementId,
-		})
+func (p *PostgresRepo) AddMovementSet(workoutMovementId uint64, set types.Set) (types.Set, error) {
+	var (
+		id     uint64
+		newSet types.Set
+	)
+
+	err := p.db.QueryRowx(`INSERT INTO movement_set (reps, weight, workout_movement_id, user_id) 
+                            VALUES ($1, $2, $3, $4)
+                            RETURNING id, reps, weight, user_id`,
+		set.Reps, set.Weight, workoutMovementId, set.User).
+		Scan(&id, &newSet.Reps, &newSet.Weight, &newSet.User)
 
 	if err != nil {
-		return err
+		return types.Set{}, err
 	}
 
-	return nil
+	// Why do I need to set it like this?
+	set.ID = id
+
+	return set, nil
 }
 
 func (p *PostgresRepo) GetMovementSet(movementSetId uint64) (types.Set, error) {
 	var set types.Set
 
-	row := p.db.QueryRowx("SELECT id, user_id FROM movement_set WHERE id = $1", movementSetId)
-	err := row.Scan(&set.ID, &set.User)
+	row := p.db.QueryRowx("SELECT id, reps, weight, user_id FROM movement_set WHERE id = $1", movementSetId)
+	err := row.Scan(&set.ID, &set.Reps, &set.Weight, &set.User)
 
 	return set, err
 }

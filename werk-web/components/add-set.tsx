@@ -1,13 +1,15 @@
 import { FormEvent, useState } from "react"
 import { useClientRequest } from "../hooks/use-request";
+import { ISet } from "../lib/types";
 
 interface Props {
     workoutId: number;
     movementId: number;
     updateWorkout: () => void
+    addSetToMovement: (movementId: number, set: ISet) => void
 }
 
-export default function AddSet({ workoutId, movementId, updateWorkout }: Props) {
+export default function AddSet({ workoutId, movementId, addSetToMovement }: Props) {
     const [reps, setReps] = useState(0)
     const [weight, setWeight] = useState(0)
 
@@ -18,9 +20,10 @@ export default function AddSet({ workoutId, movementId, updateWorkout }: Props) 
 
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts/${workoutId}/workoutMovements/${movementId}`
         const res = await doRequest(url, 'POST', { reps: reps, weight: weight })
+        const newSet = await res.json()
 
         if (res.ok) {
-            updateWorkout()
+            addSetToMovement(movementId, newSet)
             setReps(0)
             setWeight(0)
         }

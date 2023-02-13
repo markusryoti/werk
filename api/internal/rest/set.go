@@ -37,7 +37,7 @@ func (s *Handler) addSet(w http.ResponseWriter, r *http.Request) {
 
 	userId := s.getCurrentUser(r)
 
-	err = s.svc.AddMovementSet(movementId, types.Set{
+	set, err := s.svc.AddMovementSet(movementId, types.Set{
 		Reps:   reqBody.Reps,
 		Weight: reqBody.Weight,
 		User:   userId,
@@ -47,6 +47,8 @@ func (s *Handler) addSet(w http.ResponseWriter, r *http.Request) {
 		JsonErrorResponse(w, "couldn't add a new set", err, http.StatusInternalServerError)
 		return
 	}
+
+	JsonResponse(w, set, http.StatusOK)
 }
 
 func (s *Handler) removeSet(w http.ResponseWriter, r *http.Request) {

@@ -41,7 +41,7 @@ func (s *Service) GetWorkoutsByUser(userId string) ([]types.Workout, error) {
 	return s.repo.GetWorkoutsByUser(userId)
 }
 
-func (s *Service) AddNewMovement(workoutId uint64, newMovement types.Movement) error {
+func (s *Service) AddNewMovement(workoutId uint64, newMovement types.Movement) (types.Movement, error) {
 	return s.repo.AddNewMovement(workoutId, newMovement)
 }
 
@@ -49,7 +49,7 @@ func (s *Service) GetMovementsFromWorkout(workoutId uint64) ([]types.Movement, e
 	return s.repo.GetMovementsFromWorkout(workoutId)
 }
 
-func (s *Service) AddMovementSet(movementId uint64, set types.Set) error {
+func (s *Service) AddMovementSet(movementId uint64, set types.Set) (types.Set, error) {
 	return s.repo.AddMovementSet(movementId, set)
 }
 

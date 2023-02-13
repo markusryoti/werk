@@ -118,7 +118,7 @@ func (s *Handler) addMovementToWorkout(w http.ResponseWriter, r *http.Request) {
 
 	userId := s.getCurrentUser(r)
 
-	err = s.svc.AddNewMovement(workoutId, types.Movement{
+	movement, err := s.svc.AddNewMovement(workoutId, types.Movement{
 		Name: reqBody.MovementName,
 		User: userId,
 	})
@@ -126,6 +126,8 @@ func (s *Handler) addMovementToWorkout(w http.ResponseWriter, r *http.Request) {
 		JsonErrorResponse(w, "couldn't add new movement", err, http.StatusInternalServerError)
 		return
 	}
+
+	JsonResponse(w, movement, http.StatusOK)
 }
 
 func (s *Handler) removeWorkout(w http.ResponseWriter, r *http.Request) {
