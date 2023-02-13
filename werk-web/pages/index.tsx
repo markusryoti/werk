@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useAuth } from '../context/AuthUserContext'
 import styles from '../styles/Home.module.css'
 
@@ -7,9 +8,11 @@ export default function Home() {
     const router = useRouter()
     const { authUser, loading } = useAuth()
 
-    if (authUser && !loading) {
-        router.push("/workouts")
-    }
+    useEffect(() => {
+        if (authUser && !loading) {
+            router.push("/workouts")
+        }
+    }, [authUser, loading, router])
 
     return (
         <>

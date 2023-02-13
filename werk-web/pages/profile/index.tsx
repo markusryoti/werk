@@ -1,14 +1,16 @@
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useAuth } from '../../context/AuthUserContext'
 
 const Profile = () => {
     const router = useRouter()
-    const { authUser, logout } = useAuth()
+    const { authUser, logout, loading } = useAuth()
 
-    if (!authUser) {
-        router.push("/login")
-    }
+    useEffect(() => {
+        if (!authUser && !loading) {
+            router.push("/login")
+        }
+    }, [authUser, router, loading])
 
     const doLogout = async () => {
         await logout()

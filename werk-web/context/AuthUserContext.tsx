@@ -31,7 +31,7 @@ export const AuthContextProvider = ({
 }: {
     children: React.ReactNode
 }) => {
-    const [authUser, setAuthUser] = useState<AuthUser | null>({} as AuthUser)
+    const [authUser, setAuthUser] = useState<AuthUser | null>(null)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
