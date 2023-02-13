@@ -11,6 +11,8 @@ export default function Home() {
     useEffect(() => {
         if (authUser && !loading) {
             router.push("/workouts")
+        } else {
+            router.push("/login")
         }
     }, [authUser, loading, router])
 
