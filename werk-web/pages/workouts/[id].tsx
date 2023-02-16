@@ -6,7 +6,7 @@ import RemoveWorkout from "../../components/remove-workout"
 import Spinner from "../../components/spinner"
 import { useAuth } from "../../context/AuthUserContext"
 import { useClientRequest } from "../../hooks/use-request"
-import { ISet, IWorkout } from "../../lib/types"
+import { ISet, IWorkout, Movement } from "../../lib/types"
 import { parseDate } from "../../utils/date"
 
 export default function WorkoutDetail() {
@@ -39,8 +39,6 @@ export default function WorkoutDetail() {
     const addSetToMovement = (movementId: number, newSet: ISet) => {
         if (!workout) return
 
-        console.log(newSet)
-
         const updatedMovements = workout.movements.map(movement => {
             if (movement.id === movementId) {
                 movement.sets.push(newSet)
@@ -48,6 +46,17 @@ export default function WorkoutDetail() {
 
             return movement
         })
+
+        setWorkout({
+            ...workout,
+            movements: updatedMovements
+        })
+    }
+
+    const addMovement = (newMovement: Movement) => {
+        if (!workout) return
+
+        const updatedMovements = [...workout.movements, newMovement]
 
         setWorkout({
             ...workout,
@@ -75,7 +84,7 @@ export default function WorkoutDetail() {
                         key={`${movement.id}`}
                     />
                 })}
-                <AddMovement workoutId={workout.id} getWorkout={getWorkout} />
+                <AddMovement workoutId={workout.id} addMovement={addMovement} />
                 <RemoveWorkout workoutId={workout.id} />
             </div>
         </div >

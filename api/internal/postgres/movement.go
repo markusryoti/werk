@@ -33,12 +33,12 @@ func (p *PostgresRepo) AddNewMovement(workoutId uint64, newMovement types.Moveme
 		return types.Movement{}, nil
 	}
 
-	err = p.addMovementToWorkout(movement.ID, workoutId, newMovement.User)
+	addedMovement, err := p.addMovementToWorkout(movement.ID, workoutId, newMovement.User)
 	if err != nil {
 		return types.Movement{}, err
 	}
 
-	return types.Movement{}, err
+	return addedMovement, err
 }
 
 func (p *PostgresRepo) getMovement(m types.Movement) (Movement, error) {
@@ -101,21 +101,44 @@ func (p *PostgresRepo) addMovement(newMovement types.Movement) (Movement, error)
 	return p.getMovement(newMovement)
 }
 
-func (p *PostgresRepo) addMovementToWorkout(movementId, workoutId uint64, userId string) error {
-	_, err := p.db.NamedExec(`INSERT INTO workout_movement (workout_id, movement_id, user_id)
-                                VALUES (:workoutId, :movementId, :userId)`,
-		map[string]interface{}{
-			"workoutId":  workoutId,
-			"movementId": movementId,
-			"userId":     userId,
-		})
+func (p *PostgresRepo) addMovementToWorkout(movementId, workoutId uint64, userId string) (types.Movement, error) {
+	var (
+		id uint64
+	)
+
+	err := p.db.QueryRowx(`INSERT INTO workout_movement (workout_id, movement_id, user_id)
+                                VALUES ($1, $2, $3)
+                                RETURNING id`, workoutId, movementId, userId).
+		Scan(&id)
 
 	if err != nil {
 		p.logger.Errorw("Couldn't add new workout movement", "error", err,
 			"movementId", movementId, "workoutId", workoutId, "userId", userId)
 	}
 
-	return err
+	return p.getDomainMovementByWorkoutMovementId(id)
+}
+
+func (p *PostgresRepo) getDomainMovementByWorkoutMovementId(id uint64) (types.Movement, error) {
+	var (
+		workoutMovementId uint64
+		movement          types.Movement
+	)
+
+	err := p.db.QueryRowx(`SELECT
+                                workout_movement.id,
+                                movement.name,
+                                workout_movement.user_id
+                            FROM workout_movement
+                            JOIN movement
+                                ON workout_movement.movement_id = movement.id
+                            WHERE workout_movement.id = $1`, id).
+		Scan(&workoutMovementId, &movement.Name, &movement.User)
+
+	movement.ID = workoutMovementId
+	movement.Sets = make([]types.Set, 0)
+
+	return movement, err
 }
 
 func (p *PostgresRepo) GetMovementsFromWorkout(workoutId uint64) ([]types.Movement, error) {
@@ -275,7 +298,7 @@ func getCurrentMax(maxes []types.EstimatedMax) types.EstimatedMax {
 }
 
 func (p *PostgresRepo) DeleteMovement(movementId uint64) error {
-	_, err := p.db.NamedExec(`DELETE FROM movement WHERE id = :movementId`,
+	_, err := p.db.NamedExec(`DELETE FROM workout_movement WHERE id = :movementId`,
 		map[string]interface{}{
 			"movementId": movementId,
 		})
@@ -286,8 +309,13 @@ func (p *PostgresRepo) DeleteMovement(movementId uint64) error {
 func (p *PostgresRepo) GetMovement(movementId uint64) (types.Movement, error) {
 	var movement types.Movement
 
-	row := p.db.QueryRowx("SELECT id, name, user_id FROM movement WHERE id = $1", movementId)
+	row := p.db.QueryRowx(`SELECT workout_movement.id, movement.name, workout_movement.user_id 
+                            FROM workout_movement 
+                            JOIN movement ON workout_movement.movement_id = movement.id
+                            WHERE workout_movement.id = $1`, movementId)
 	err := row.Scan(&movement.ID, &movement.Name, &movement.User)
+
+	movement.Sets = make([]types.Set, 0)
 
 	return movement, err
 }

@@ -18,7 +18,7 @@ export default function MovementCollapse({ movement, workoutId, getWorkout, addS
                 {movement.name}
             </div>
             <div className="collapse-content flex flex-col align-center">
-                {movement.sets.length > 0 ? (
+                {movement.sets?.length > 0 ? (
                     <table className="table w-full">
                         <thead>
                             <tr>
