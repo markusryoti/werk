@@ -42,8 +42,12 @@ export const AuthContextProvider = ({
                     email: user.email,
                     displayName: user.displayName
                 })
+
+                const token = await user.getIdToken(true)
+                await doSessionLogin(token)
             } else {
                 setAuthUser(null)
+                await doSessionLogout()
             }
         })
 
@@ -65,27 +69,18 @@ export const AuthContextProvider = ({
 
     const signup = async (email: string, password: string): Promise<void> => {
         setLoading(true)
-
-        const userCreds = await createUserWithEmailAndPassword(auth, email, password)
-        const token = await userCreds.user.getIdToken(true)
-        await doSessionLogin(token)
-
+        await createUserWithEmailAndPassword(auth, email, password)
         setLoading(false)
     }
 
     const login = async (email: string, password: string) => {
         setLoading(true)
-
-        const userCreds = await signInWithEmailAndPassword(auth, email, password)
-        const token = await userCreds.user.getIdToken(true)
-        await doSessionLogin(token)
-
+        await signInWithEmailAndPassword(auth, email, password)
         setLoading(false)
     }
 
     const logout = async () => {
         await signOut(auth)
-        await doSessionLogout()
     }
 
     const getToken = async (): Promise<string | undefined> => {

@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import WorkoutListView from "../../components/workout-list-view";
 import { IWorkout } from "../../lib/types";
 
@@ -15,7 +16,7 @@ export default function Workouts({ workouts }: Props) {
     )
 }
 
-export async function getServerSideProps(context: any) {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
     const token = context.req.cookies.session
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/workouts`, {
