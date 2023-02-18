@@ -33,6 +33,7 @@ export const AuthContextProvider = ({
 }) => {
     const [authUser, setAuthUser] = useState<AuthUser | null>(null)
     const [loading, setLoading] = useState(false)
+    const [currentToken, setCurrentToken] = useState("")
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -43,7 +44,7 @@ export const AuthContextProvider = ({
                     displayName: user.displayName
                 })
 
-                const token = await user.getIdToken(true)
+                const token = await user.getIdToken()
                 await doSessionLogin(token)
             } else {
                 setAuthUser(null)
@@ -84,8 +85,15 @@ export const AuthContextProvider = ({
     }
 
     const getToken = async (): Promise<string | undefined> => {
-        const token = await auth.currentUser?.getIdToken(true)
-        await doSessionLogin(token!)
+        const token = await auth.currentUser?.getIdToken()
+
+        if (!token) return token
+
+        if (token !== currentToken) {
+            setCurrentToken(token)
+            await doSessionLogin(token)
+        }
+
         return token
     }
 
